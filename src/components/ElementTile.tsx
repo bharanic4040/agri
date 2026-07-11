@@ -16,7 +16,7 @@ export default function ElementTile({ element, }: ElementTileProps) {
         <div className="font-bold">విడుదల సంస్థ</div>
         <div>{element?.["విడుదల_సంస్థ"]}</div>
 
-        <div className="font-bold">పెంక విధానం</div>
+        <div className="font-bold">పెంపక విధానం</div>
         <div>{element?.["పెంపక_విధానం"]}</div>
 
         <div className="font-bold">పంట కాలం</div>
