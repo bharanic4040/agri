@@ -1,12 +1,97 @@
-    
-import type { CropProps } from "../models/agri";
 
-export function loadCropsAndReturnMap(cropTypesArray: CropProps[]) : Map<string, CropProps> {
+import type { CropProps, Loc } from "../models/agri";
+
+export function loadCropsAndReturnMap(cropTypesArray: CropProps[]): Map<string, CropProps> {
   const dictionaryMap = new Map<string, CropProps>();
 
   cropTypesArray.forEach((entry: any) => {
-     dictionaryMap.set(entry["రకం"], entry);
+    dictionaryMap.set(entry["రకం"], entry);
   });
 
   return dictionaryMap;
+}
+
+/*
+===================
+You can make the forecast more useful by requesting additional fields such as:
+
+precipitation_probability_max – chance of rain (%)
+temperature_2m_min – minimum temperature
+relative_humidity_2m_mean – average humidity
+wind_speed_10m_max – maximum wind speed
+soil_temperature_0cm – soil temperature
+soil_moisture_0_to_1cm – surface soil moisture
+et0_fao_evapotranspiration – estimated water loss from soil and plants
+*/
+
+/**
+0 mm - No rain
+0.1 mm - Almost dry
+1.8 mm - Light rain
+10 mm - Moderate rain
+50+ mm - Heavy rain
+ */
+export function getRainDescription(rainfallMM: number | undefined) : string {
+  if (rainfallMM === undefined) {
+    return "";
+  }
+  if (rainfallMM === 0) {
+    return "☀️ వర్షం లేదు";
+  } else if (rainfallMM < 2.5) {
+    return "🌤️ చాలా తేలికపాటి వర్షం";
+  } else if (rainfallMM < 7.5) {
+    return "🌦️ తేలికపాటి వర్షం";
+  } else if (rainfallMM < 35) {
+    return "🌧️ మోస్తరు వర్షం";
+  } else if (rainfallMM < 65) {
+    return "⛈️ భారీ వర్షం";
+  } else {
+    return "🌊 అతి భారీ వర్షం";
+  }
+}
+
+const OPEN_METEO_BASE_URL = "https://api.open-meteo.com/v1/forecast?daily=temperature_2m_max,precipitation_sum&timezone=auto&";
+
+export async function fetchWeatherData(latitude?: string, longitude?: string) {
+  try {
+    const url = `${OPEN_METEO_BASE_URL}latitude=${latitude}&longitude=${longitude}`;
+    const res = await fetch(url);
+    if (!res.ok) {
+      throw new Error(`weather data not found for - ${latitude} and ${longitude}.`);
+    }
+    const data = await res.json();
+    const forecast = data.daily.time.map((date: string, index: number) => ({
+      date,
+      maxTemp: data.daily.temperature_2m_max[index],
+      rain: data.daily.precipitation_sum[index],
+    }));
+    return forecast;
+  } catch (err) {
+    console.error(`weather data not found for - ${latitude} and ${longitude}.`, err);
+    return [];
+  }
+}
+
+export function getLocation(): Promise<Loc> {
+  return new Promise((resolve, reject) => {
+    if (!navigator.geolocation) {
+      reject(new Error("Geolocation not supported"));
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        resolve({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+        });
+      },
+      (error) => reject(error)
+    );
+  });
+}
+
+export function formatDateToDDMMYYYY(date: string): string {
+  const [year, month, day] = date.split("-");
+  return `${day}-${month}-${year}`;
 }

@@ -11,3 +11,14 @@ export interface CropProps {
     "అనుకూల_ప్రాంతం"?: string | null;
     "ప్రత్యేక_లక్షణాలు"?: string | null;
 }
+
+export interface RainForecast {
+    date: string;
+    maxTemp?: number;
+    rain?: number;
+}
+
+export interface Loc {
+    longitude: number;
+    latitude: number;
+}
