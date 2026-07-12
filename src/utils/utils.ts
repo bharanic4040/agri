@@ -22,7 +22,7 @@ export function parseLLMOutputAndFormat(paddyOutput: FertilizerScheduleResponse)
     }
     let fertArray: string[] = [];
     schedule.fertilizers?.forEach((fertilizer, _) => {
-      const fertItem = fertilizer.name + " - " + fertilizer.quantity_kg_per_acre + "KG."
+      const fertItem = fertilizer.name + " - " + fertilizer.quantity_kg_per_acre + " KG."
       fertArray.push(fertItem);
     });
     cropMap.set(schedule.timeline, fertArray);
