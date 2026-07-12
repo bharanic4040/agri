@@ -43,7 +43,7 @@ export default function CropType() {
     const fetchFertilizerSchedule = async () => {
         try {
             setPaddyLLMOutput(null);
-            const data = await fetchCropFertilizerSchedule("paddy", cropSubType);
+            const data = await fetchCropFertilizerSchedule(cropType, cropSubType);
             if (!data) {
                 return;
             }

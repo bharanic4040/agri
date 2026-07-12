@@ -59,7 +59,7 @@ function createGeminiLLMBody(CROP_TYPE: string, CROP_SUB_TYPE: string) {
     "systemInstruction": {
       "parts": [
         {
-          "text": prompt
+          "text": "You are an expert agronomist specializing in South Indian paddy cultivation. Provide highly accurate, scientific, and region-appropriate fertilizer schedules. Always respond strictly in the requested JSON schema with proper formatting. Always return the complete output in telugu language only"
         }
       ]
     },
@@ -67,7 +67,7 @@ function createGeminiLLMBody(CROP_TYPE: string, CROP_SUB_TYPE: string) {
       {
         "parts": [
           {
-            "text": `Generate a comprehensive fertilizer schedule for ${CROP_SUB_TYPE} ${CROP_TYPE} crop. Context: Assume standard standard soil test values (medium fertility). Provide the dosage per acre using standard fertilizers: Urea, Single Super Phosphate, and Muriate of Potash. Split the schedule into clear timeline phases: Basal, Tillering, Panicle Initiation, and Flowering/Heading.`
+            "text": prompt
           }
         ]
       }
