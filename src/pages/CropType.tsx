@@ -54,6 +54,14 @@ export default function CropType() {
         }
     };
 
+    function getPhase(timelineAndPhase: string): string {
+        return timelineAndPhase.split("|")[0];
+    }
+
+    function getTimeline(timelineAndPhase: string) : string {
+        return timelineAndPhase.split("|")[1];
+    }
+
     return (
         <div className="text-blue-700 min-h-screen flex flex-col p-8">
 
@@ -112,7 +120,9 @@ export default function CropType() {
                     style={{ marginTop: "10px" }}>
                     {[...paddyLLMOutput.entries()].map(([timeline, fertilizers]) => (
                         <div key={timeline} style={{ marginBottom: "10px"}}>
-                            <span className="text-red-700 font-bold">{timeline}</span>
+                       { cropType === "మామిడి" &&    
+                       <span className="text-red-700 font-bold">{getPhase(timeline)}</span>
+                          }   <span className="text-red-700 font-bold">{getTimeline(timeline)}</span>
                             <span>
                                 {fertilizers.map((item) => (
                                     <div key={item}>

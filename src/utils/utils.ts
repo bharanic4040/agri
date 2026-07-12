@@ -25,7 +25,7 @@ export function parseLLMOutputAndFormat(paddyOutput: FertilizerScheduleResponse)
       const fertItem = fertilizer.name + " - " + fertilizer.quantity_kg_per_acre + " KG."
       fertArray.push(fertItem);
     });
-    cropMap.set(schedule.timeline, fertArray);
+    cropMap.set(schedule.phase + "|" +schedule.timeline, fertArray);
   });
 
   return cropMap;

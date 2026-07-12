@@ -48,11 +48,18 @@ export default async function handler(
 }
 
 function createGeminiLLMBody(CROP_TYPE: string, CROP_SUB_TYPE: string) {
+  let MANGO_PROMPT = `Generate a comprehensive fertilizer schedule for a ${CROP_SUB_TYPE} ${CROP_TYPE} orchard. Context: Assume standard soil test values (medium fertility). Provide the dosage per tree (and total per acre based on 80–110 trees/acre spacing) using standard straight fertilizers: Urea, Single Super Phosphate (SSP), and Muriate of Potash (MOP). Structure the output into clear timeline phases spanning Tree Age Tiers (Year 1, Annual Increments for Years 2–9, and Fully Bearing Year 10+ onwards). For the fully bearing years, divide the annual nutrition into a split application timeline: Phase 1: Post-Harvest / Early Monsoon (June–July - 50% N, 100% P, 50% K) and Phase 2: Post-Monsoon / Pre-Bud Break (September–October - remaining 50% N, 50% K). Explicitly include safety warnings against late nitrogen application near flowering, along with critical trace mineral foliar sprays (Zinc, Boron) to prevent fruit cracking and ensure maximum sugar development`;
+  let PADDY_PROMPT = `Generate a comprehensive fertilizer schedule for ${CROP_SUB_TYPE} ${CROP_TYPE} crop. Context: Assume standard standard soil test values (medium fertility). Provide the dosage per acre using standard fertilizers: Urea, Single Super Phosphate, and Muriate of Potash. Split the schedule into clear timeline phases: Basal, Tillering, Panicle Initiation, and Flowering/Heading.`;
+  
+  let prompt = PADDY_PROMPT;
+  if (CROP_TYPE === "మామిడి") {
+    prompt = MANGO_PROMPT;
+  }
   const bodyPostForGeminiLLM = {
     "systemInstruction": {
       "parts": [
         {
-          "text": `You are an expert agronomist specializing in South Indian ${CROP_TYPE} cultivation. Provide highly accurate, scientific, and region-appropriate fertilizer schedules. Always respond strictly in the requested JSON schema with proper formatting. Always return the complete output in telugu language only`
+          "text": prompt
         }
       ]
     },
