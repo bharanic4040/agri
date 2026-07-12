@@ -72,7 +72,7 @@ export default function CropType() {
             <div>
                 <button onClick={fetchFertilizerSchedule} style={{ marginTop: "10px"}}
                 className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg shadow">
-                    ఎరువుల యాజమాన్యం చూడండి
+                    ఎరువుల యాజమాన్యం (ఎకరానికి) చూడండి
                 </button></div>
 
             {paddyLLMOutput &&
