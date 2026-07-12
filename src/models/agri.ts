@@ -22,3 +22,24 @@ export interface Loc {
     longitude: number;
     latitude: number;
 }
+
+export interface FertilizerScheduleResponse {
+  crop_variety?: string | null;
+  total_duration_days?: number | null;
+  recommended_npk_ratio_kg_per_acre?: string | null;
+  schedule?: FertilizerSchedule[] | null;
+  critical_precautions?: (string | null)[] | null;
+}
+
+export interface FertilizerSchedule {
+  phase?: string | null;
+  timeline?: string | null;
+  fertilizers?: Fertilizer[] | null;
+  application_method?: string | null;
+  agronomist_notes?: string | null;
+}
+
+export interface Fertilizer {
+  name?: string | null;
+  quantity_kg_per_acre?: number | null;
+}

@@ -1,0 +1,73 @@
+{
+  "crop_variety": "సోనా మసూరి (BPT 5204)",
+  "total_duration_days": 135,
+  "recommended_npk_ratio_kg_per_acre": "120:60:40",
+  "schedule": [
+    {
+      "phase": "నాటు వేసే ముందు (Basal)",
+      "timeline": "నాటు వేసే సమయం",
+      "fertilizers": [
+        {
+          "name": "సింగిల్ సూపర్ ఫాస్ఫేట్ (SSP)",
+          "quantity_kg_per_acre": 375
+        },
+        {
+          "name": "యూరియా",
+          "quantity_kg_per_acre": 40
+        },
+        {
+          "name": "మ్యూరేట్ ఆఫ్ పొటాష్ (MOP)",
+          "quantity_kg_per_acre": 33
+        }
+      ],
+      "application_method": "చివరి దుక్కిలో నేలలో కలియదున్నాలి.",
+      "agronomist_notes": "నేల సారాన్ని బట్టి బేసల్ డోస్ వేయడం వల్ల వేర్లు బాగా అభివృద్ధి చెందుతాయి."
+    },
+    {
+      "phase": "పిలకల దశ (Tillering)",
+      "timeline": "నాటు వేసిన 20-25 రోజులకు",
+      "fertilizers": [
+        {
+          "name": "యూరియా",
+          "quantity_kg_per_acre": 50
+        }
+      ],
+      "application_method": "పైన చల్లడం (Top dressing).",
+      "agronomist_notes": "నీరు తక్కువగా ఉన్నప్పుడు యూరియా వేయడం వల్ల నత్రజని నష్టం తగ్గుతుంది."
+    },
+    {
+      "phase": "ప్యానికల్ ఇనిషియేషన్ (Panicle Initiation)",
+      "timeline": "నాటు వేసిన 45-50 రోజులకు",
+      "fertilizers": [
+        {
+          "name": "యూరియా",
+          "quantity_kg_per_acre": 50
+        },
+        {
+          "name": "మ్యూరేట్ ఆఫ్ పొటాష్ (MOP)",
+          "quantity_kg_per_acre": 33
+        }
+      ],
+      "application_method": "పైన చల్లడం (Top dressing).",
+      "agronomist_notes": "ఈ దశలో పొటాష్ వేయడం వల్ల కాండం బలంగా ఉండి పంట పడకుండా (Lodging) నిరోధిస్తుంది."
+    },
+    {
+      "phase": "పూత దశ (Flowering/Heading)",
+      "timeline": "నాటు వేసిన 75-80 రోజులకు",
+      "fertilizers": [
+        {
+          "name": "యూరియా",
+          "quantity_kg_per_acre": 35
+        }
+      ],
+      "application_method": "చివరి దశగా పైన చల్లడం.",
+      "agronomist_notes": "ధాన్యపు గింజలు నిండుగా రావడానికి యూరియా సమతుల్యంగా ఉండాలి."
+    }
+  ],
+  "critical_precautions": [
+    "పొలంలో నీరు నిల్వ ఉన్నప్పుడు మాత్రమే యూరియా వేయకండి.",
+    "జింక్ లోపం కనిపిస్తే ఎకరాకు 20 కిలోల జింక్ సల్ఫేట్ బేసల్ డోస్‌లో కలపండి.",
+    "మట్టి పరీక్షా నివేదిక ఆధారంగా ఎరువుల మోతాదును సర్దుబాటు చేయండి.",
+    "పంట ఆఖరి దశలో అధికంగా యూరియా వాడటం వల్ల పురుగుల ఉధృతి పెరిగే అవకాశం ఉంది."
+  ]
+}

@@ -1,16 +1,18 @@
 import { Link } from "react-router-dom";
 import ElementTile from "../components/ElementTile";
 import cropTypes from "../data/paddy-type.json";
+import paddyOuput from "../data/sample-output-gemini.json";
 import type { CropProps } from "../models/agri";
 import { FaHome } from "react-icons/fa";
 import { useState } from "react";
-import { loadCropsAndReturnMap } from "../utils/utils";
+import { loadCropsAndReturnMap, parseLLMOutputAndFormat } from "../utils/utils";
 
 
 export default function CropType() {
 
     const [cropSubType, setSubCropType] = useState<string>("సోనా మసూరి (BPT 3291)");
     const crop_types: Map<string, CropProps> = loadCropsAndReturnMap(cropTypes.types);
+    const paddyLLMOutput: Map<string, string> = parseLLMOutputAndFormat(paddyOuput);
 
     const changeCropSubType = (selectedValue: string) => {
         setSubCropType(selectedValue);
@@ -43,23 +45,26 @@ export default function CropType() {
                             {element.రకం}
                         </option>
                     ))}
-
                     {[...crop_types.entries()].map(([name, _]) => (
-                        <option key={name} value={name}>
-                            {name}
-                        </option>
+                        <option key={name} value={name}> {name}  </option>
                     ))}
                 </select>
-
             </div>
             <div
                 className=" gap-8 justify-center"
                 style={{ marginTop: "10px" }}>
-                <ElementTile
-                    element={crop_types.get(cropSubType)}
-                />
-
+                <ElementTile element={crop_types.get(cropSubType)}/>
             </div>
+          <div  className=" gap-8 justify-center"
+                style={{ marginTop: "10px" }}>
+               {[...paddyLLMOutput.entries()].map(([timeline, fertilizers]) => (
+                    <div>
+                        <span>{timeline}</span>
+                        <span>{fertilizers}</span>
+                        </div>
+                    ))}
+          </div>
+               
         </div>
 
     );

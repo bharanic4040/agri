@@ -1,11 +1,22 @@
 
-import type { CropProps, Loc } from "../models/agri";
+import type { CropProps, FertilizerScheduleResponse, Loc } from "../models/agri";
 
 export function loadCropsAndReturnMap(cropTypesArray: CropProps[]): Map<string, CropProps> {
   const dictionaryMap = new Map<string, CropProps>();
 
   cropTypesArray.forEach((entry: any) => {
     dictionaryMap.set(entry["రకం"], entry);
+  });
+
+  return dictionaryMap;
+}
+
+export function parseLLMOutputAndFormat(paddyOutput: FertilizerScheduleResponse): Map<string, string> {
+  const dictionaryMap = new Map<string, string>();
+  paddyOutput.schedule?.forEach((schedule, _ ) => {
+    schedule.fertilizers?.forEach((fertilizer, _ ) => {
+      const fertItem = fertilizer.name + " - " + fertilizer.quantity_kg_per_acre + "KG."
+    });
   });
 
   return dictionaryMap;
