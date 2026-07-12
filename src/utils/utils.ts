@@ -17,7 +17,7 @@ export function parseLLMOutputAndFormat(paddyOutput: FertilizerScheduleResponse)
     return cropMap;
   }
   paddyOutput.schedule?.forEach((schedule, _) => {
-    if (!schedule.timeline ||  !schedule.fertilizers || schedule.fertilizers?.length === 0) {
+    if (!schedule.timeline || !schedule.fertilizers || schedule.fertilizers?.length === 0) {
       return;
     }
     let fertArray: string[] = [];
@@ -112,6 +112,9 @@ export function getLocation(): Promise<Loc> {
 }
 
 export function formatDateToDDMMYYYY(date: string): string {
+  if (!date.includes("-")) {
+    return date;
+  }
   const [year, month, day] = date.split("-");
   return `${day}-${month}-${year}`;
 }
@@ -121,7 +124,7 @@ function createGeminiLLMBody(CROP_TYPE: string, CROP_SUB_TYPE: string) {
     "systemInstruction": {
       "parts": [
         {
-          "text": `"You are an expert agronomist specializing in South Indian ${CROP_TYPE} cultivation. Provide highly accurate, scientific, and region-appropriate fertilizer schedules. Always respond strictly in the requested JSON schema with proper formatting. Always return the complete output in telugu language only`
+          "text": `You are an expert agronomist specializing in South Indian ${CROP_TYPE} cultivation. Provide highly accurate, scientific, and region-appropriate fertilizer schedules. Always respond strictly in the requested JSON schema with proper formatting. Always return the complete output in telugu language only`
         }
       ]
     },
@@ -213,36 +216,28 @@ function createGeminiLLMBody(CROP_TYPE: string, CROP_SUB_TYPE: string) {
   return bodyPostForGeminiLLM;
 }
 
-const GEMINI_FLASH_LITE_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=AIzaSyAqsGTVzcyZjB4ez4SYFc1TypzarVpVBMM";
+export async function fetchCropFertilizerSchedule(
+  cropType: string,
+  cropSubType: string
+): Promise<FertilizerScheduleResponse | null> {
 
-export async function fetchCropFertilizerSchedule(cropSubType: string, cropType: string): Promise<FertilizerScheduleResponse | null> {
   try {
-    const url = `${GEMINI_FLASH_LITE_BASE_URL}`;
-    const bodyPostForGeminiLLM = createGeminiLLMBody(cropType, cropSubType);
-
-    const res = await fetch(url, {
+    const res = await fetch("/api/fertilizer", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(bodyPostForGeminiLLM)
+      body: JSON.stringify({ cropType, cropSubType }),
     });
 
     if (!res.ok) {
       return null;
     }
-
-    const result = await res.json();
-    if (!result || !result.candidates[0]) {
-      return null;
-    }
-    const data: FertilizerScheduleResponse = JSON.parse(
-      result.candidates[0].content.parts[0].text
-    );
-
+    const data: FertilizerScheduleResponse =  await res.json();
     return data;
   } catch (err) {
-    console.error(`Error fetching ${cropSubType} fertilizer details.`, err);
-    return null;
+    console.error(err);
   }
+  return null;
+
 }

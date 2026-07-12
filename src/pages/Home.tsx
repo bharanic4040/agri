@@ -15,6 +15,9 @@ export default function Home() {
           const lat = loc.latitude.toFixed(4);
           const lon = loc.longitude.toFixed(4);
           const data: RainForecast[] = await fetchWeatherData(lat, lon);
+          data[0].date = "ఈ రోజు";
+          data[1].date = "రేపు";
+          data[2].date = "ఎల్లుండి";
           setForecast(data);
         }
       } catch (err) {
@@ -33,7 +36,7 @@ export default function Home() {
         <Link to="/crop-types" className="w-1/2">
           <div className="w-full py-4 bg-gradient-to-r from-blue-700 to-indigo-800 rounded-lg shadow-lg text-center">
             <h2 className="text-3xl md:text-4xl font-extrabold text-white tracking-wide">
-               వరి రకాలు
+               పంట సాగు
             </h2>
           </div>
         </Link>
