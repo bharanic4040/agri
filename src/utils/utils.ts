@@ -125,7 +125,7 @@ export async function fetchCropFertilizerSchedule(
 ): Promise<FertilizerScheduleResponse | null> {
 
   try {
-    const res = await fetch("/api/fertilizer", {
+    const res = await fetch("/api/agentCall", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
