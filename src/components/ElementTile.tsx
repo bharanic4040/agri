@@ -12,13 +12,6 @@ export default function ElementTile({ element, }: ElementTileProps) {
 
         <div className="font-bold">రకం</div>
         <div>{element?.["రకం"]}</div>
-
-        <div className="font-bold">విడుదల సంస్థ</div>
-        <div>{element?.["విడుదల_సంస్థ"]}</div>
-
-        <div className="font-bold">పెంపక విధానం</div>
-        <div>{element?.["పెంపక_విధానం"]}</div>
-
         <div className="font-bold">పంట కాలం</div>
         <div>{element?.["పంట_కాలం"]}</div>
 

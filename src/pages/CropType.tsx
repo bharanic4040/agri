@@ -1,25 +1,39 @@
 import { Link } from "react-router-dom";
 import ElementTile from "../components/ElementTile";
 import cropTypes from "../data/paddy-type.json";
-import paddyOuput from "../data/sample-output-gemini.json";
 import type { CropProps } from "../models/agri";
 import { FaHome } from "react-icons/fa";
 import { useState } from "react";
-import { loadCropsAndReturnMap, parseLLMOutputAndFormat } from "../utils/utils";
+import { fetchCropFertilizerSchedule, loadCropsAndReturnMap, parseLLMOutputAndFormat } from "../utils/utils";
 
 
 export default function CropType() {
 
     const [cropSubType, setSubCropType] = useState<string>("సోనా మసూరి (BPT 3291)");
     const crop_types: Map<string, CropProps> = loadCropsAndReturnMap(cropTypes.types);
-    const paddyLLMOutput: Map<string, string> = parseLLMOutputAndFormat(paddyOuput);
+    const [paddyLLMOutput, setPaddyLLMOutput] = useState<Map<string, string[]> | null>(null);
+
 
     const changeCropSubType = (selectedValue: string) => {
+        setPaddyLLMOutput(null);
         setSubCropType(selectedValue);
     };
 
-    return (
+    const fetchFertilizerSchedule = async () => {
+        try {
+            setPaddyLLMOutput(null);
+            const data = await fetchCropFertilizerSchedule("paddy", cropSubType);
+            if (!data) {
+                return;
+            }
+            const paddyLLMOutput: Map<string, string[]> = parseLLMOutputAndFormat(data);
+            setPaddyLLMOutput(paddyLLMOutput);
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
+    return (
         <div className="text-blue-700 min-h-screen flex flex-col p-8">
 
             <div className="w-full py-4 mb-6 bg-gradient-to-r from-blue-700 to-indigo-800 rounded-lg shadow-lg text-center">
@@ -53,18 +67,33 @@ export default function CropType() {
             <div
                 className=" gap-8 justify-center"
                 style={{ marginTop: "10px" }}>
-                <ElementTile element={crop_types.get(cropSubType)}/>
+                <ElementTile element={crop_types.get(cropSubType)} />
             </div>
-          <div  className=" gap-8 justify-center"
-                style={{ marginTop: "10px" }}>
-               {[...paddyLLMOutput.entries()].map(([timeline, fertilizers]) => (
-                    <div>
-                        <span>{timeline}</span>
-                        <span>{fertilizers}</span>
+            <div>
+                <button onClick={fetchFertilizerSchedule} style={{ marginTop: "10px"}}
+                className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg shadow">
+                    ఎరువుల యాజమాన్యం చూడండి
+                </button></div>
+
+            {paddyLLMOutput &&
+                <div className="text-blue-700 bg-white rounded-lg shadow-md p-5 max-w-lg mx-auto"
+                    style={{ marginTop: "10px" }}>
+                    {[...paddyLLMOutput.entries()].map(([timeline, fertilizers]) => (
+                        <div key={timeline} style={{ marginBottom: "10px"}}>
+                            <span className="text-red-700 font-bold">{timeline}</span>
+                            <span>
+                                {fertilizers.map((item) => (
+                                    <div key={item}>
+                                        {item}
+                                    </div>
+                                ))}
+                            </span>
+                            <hr />
                         </div>
                     ))}
-          </div>
-               
+                </div>
+            }
+
         </div>
 
     );

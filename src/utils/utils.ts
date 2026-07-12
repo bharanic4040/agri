@@ -11,15 +11,24 @@ export function loadCropsAndReturnMap(cropTypesArray: CropProps[]): Map<string, 
   return dictionaryMap;
 }
 
-export function parseLLMOutputAndFormat(paddyOutput: FertilizerScheduleResponse): Map<string, string> {
-  const dictionaryMap = new Map<string, string>();
-  paddyOutput.schedule?.forEach((schedule, _ ) => {
-    schedule.fertilizers?.forEach((fertilizer, _ ) => {
+export function parseLLMOutputAndFormat(paddyOutput: FertilizerScheduleResponse): Map<string, string[]> {
+  const cropMap = new Map<string, string[]>();
+  if (!paddyOutput.schedule) {
+    return cropMap;
+  }
+  paddyOutput.schedule?.forEach((schedule, _) => {
+    if (!schedule.timeline ||  !schedule.fertilizers || schedule.fertilizers?.length === 0) {
+      return;
+    }
+    let fertArray: string[] = [];
+    schedule.fertilizers?.forEach((fertilizer, _) => {
       const fertItem = fertilizer.name + " - " + fertilizer.quantity_kg_per_acre + "KG."
+      fertArray.push(fertItem);
     });
+    cropMap.set(schedule.timeline, fertArray);
   });
 
-  return dictionaryMap;
+  return cropMap;
 }
 
 /*
@@ -42,7 +51,7 @@ et0_fao_evapotranspiration – estimated water loss from soil and plants
 10 mm - Moderate rain
 50+ mm - Heavy rain
  */
-export function getRainDescription(rainfallMM: number | undefined) : string {
+export function getRainDescription(rainfallMM: number | undefined): string {
   if (rainfallMM === undefined) {
     return "";
   }
@@ -105,4 +114,135 @@ export function getLocation(): Promise<Loc> {
 export function formatDateToDDMMYYYY(date: string): string {
   const [year, month, day] = date.split("-");
   return `${day}-${month}-${year}`;
+}
+
+function createGeminiLLMBody(CROP_TYPE: string, CROP_SUB_TYPE: string) {
+  const bodyPostForGeminiLLM = {
+    "systemInstruction": {
+      "parts": [
+        {
+          "text": `"You are an expert agronomist specializing in South Indian ${CROP_TYPE} cultivation. Provide highly accurate, scientific, and region-appropriate fertilizer schedules. Always respond strictly in the requested JSON schema with proper formatting. Always return the complete output in telugu language only`
+        }
+      ]
+    },
+    "contents": [
+      {
+        "parts": [
+          {
+            "text": `Generate a comprehensive fertilizer schedule for ${CROP_SUB_TYPE} ${CROP_TYPE} crop. Context: Assume standard standard soil test values (medium fertility). Provide the dosage per acre using standard fertilizers: Urea, Single Super Phosphate, and Muriate of Potash. Split the schedule into clear timeline phases: Basal, Tillering, Panicle Initiation, and Flowering/Heading.`
+          }
+        ]
+      }
+    ],
+    "generationConfig": {
+      "responseMimeType": "application/json",
+      "responseSchema": {
+        "type": "OBJECT",
+        "properties": {
+          "crop_variety": {
+            "type": "STRING"
+          },
+          "total_duration_days": {
+            "type": "INTEGER"
+          },
+          "recommended_npk_ratio_kg_per_acre": {
+            "type": "STRING"
+          },
+          "schedule": {
+            "type": "ARRAY",
+            "items": {
+              "type": "OBJECT",
+              "properties": {
+                "phase": {
+                  "type": "STRING"
+                },
+                "timeline": {
+                  "type": "STRING"
+                },
+                "fertilizers": {
+                  "type": "ARRAY",
+                  "items": {
+                    "type": "OBJECT",
+                    "properties": {
+                      "name": {
+                        "type": "STRING"
+                      },
+                      "quantity_kg_per_acre": {
+                        "type": "NUMBER"
+                      }
+                    },
+                    "required": [
+                      "name",
+                      "quantity_kg_per_acre"
+                    ]
+                  }
+                },
+                "application_method": {
+                  "type": "STRING"
+                },
+                "agronomist_notes": {
+                  "type": "STRING"
+                }
+              },
+              "required": [
+                "phase",
+                "timeline",
+                "fertilizers",
+                "application_method",
+                "agronomist_notes"
+              ]
+            }
+          },
+          "critical_precautions": {
+            "type": "ARRAY",
+            "items": {
+              "type": "STRING"
+            }
+          }
+        },
+        "required": [
+          "crop_variety",
+          "total_duration_days",
+          "recommended_npk_ratio_kg_per_acre",
+          "schedule",
+          "critical_precautions"
+        ]
+      }
+    }
+  };
+  return bodyPostForGeminiLLM;
+}
+
+const GEMINI_FLASH_LITE_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=AIzaSyAqsGTVzcyZjB4ez4SYFc1TypzarVpVBMM";
+
+export async function fetchCropFertilizerSchedule(cropSubType: string, cropType: string): Promise<FertilizerScheduleResponse | null> {
+  try {
+    const url = `${GEMINI_FLASH_LITE_BASE_URL}`;
+    const bodyPostForGeminiLLM = createGeminiLLMBody(cropType, cropSubType);
+
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(bodyPostForGeminiLLM)
+    });
+
+    if (!res.ok) {
+      return null;
+    }
+
+    const result = await res.json();
+    if (!result || !result.candidates[0]) {
+      return null;
+    }
+    const data: FertilizerScheduleResponse = JSON.parse(
+      result.candidates[0].content.parts[0].text
+    );
+
+    return data;
+  } catch (err) {
+    console.error(`Error fetching ${cropSubType} fertilizer details.`, err);
+    return null;
+  }
 }
