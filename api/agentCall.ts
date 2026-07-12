@@ -16,7 +16,7 @@ export default async function handler(
   if (req.method === "OPTIONS") {
     return res.status(200).end();
   }
- 
+
   try {
     const { cropType, cropSubType } = req.body;
     const bodyPostForGeminiLLM = createGeminiLLMBody(cropType, cropSubType);
@@ -30,7 +30,6 @@ export default async function handler(
         },
       }
     );
-
     const result = response.data;
     const text = result?.candidates?.[0]?.content?.parts?.[0]?.text;
 
