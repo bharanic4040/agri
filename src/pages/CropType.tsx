@@ -83,7 +83,6 @@ export default function CropType() {
             if (!data) {
                 return;
             }
-            console.log("PESTS" + data);
             setPestsLLMOutput(data);
         } catch (err) {
             console.error(err);
@@ -130,7 +129,7 @@ export default function CropType() {
                     {"పంట : "}
                 </label>
                 <select value={cropType} onChange={(e) => changeCropType(e.target.value)}
-                    className="px-4 py-3 text-lg font-semibold  bg-white border border-gray-300 rounded-2xl shadow-md
+                    className="h-16 px-4 py-3 text-lg font-semibold  bg-white border border-gray-300 rounded-2xl shadow-md
                                        focus:outline-none  focus:ring-2 focus:ring-blue-500  focus:border-blue-500">
                     {Array.from(CROP_TYPES!.values()).map((element) => (
                         <option key={element} value={element}> {element} </option>
@@ -143,7 +142,7 @@ export default function CropType() {
                     {"రకం : "}
                 </label>
                 <select value={cropSubType} onChange={(e) => changeCropSubType(e.target.value)}
-                    className="px-4 py-3 text-lg font-semibold  bg-white border border-gray-300 rounded-2xl shadow-md
+                    className="h-16 px-4 py-3 text-lg font-semibold  bg-white border border-gray-300 rounded-2xl shadow-md
                                        focus:outline-none  focus:ring-2 focus:ring-blue-500  focus:border-blue-500">
                     {Array.from(cropSubTypes!.values()).map((element) => (
                         <option key={element.రకం} value={element.రకం}>
@@ -162,7 +161,7 @@ export default function CropType() {
             <div>
                 <button onClick={fetchFertilizerSchedule} style={{ marginTop: "10px" }}
                     className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg shadow">
-                    ఎరువుల యాజమాన్యం (ఎకరానికి) - చూడండి
+                    ఎరువుల యాజమాన్యం (ఎకరానికి) - నొక్కండి
                 </button></div>
 
             {paddyLLMOutput &&
@@ -185,14 +184,14 @@ export default function CropType() {
                     ))}
                 </div>
             }
-            <div  style={{ marginTop: "20px" }}>
- <hr />
+            <div style={{ marginTop: "20px" }}>
+                <hr />
             </div>
-           
-             <div>
+
+            <div>
                 <button onClick={fetchPestsAndDiseases} style={{ marginTop: "20px", marginBottom: "5px" }}
                     className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg shadow">
-                    పురుగులు మరియు తెగుళ్లు - చూడండి
+                    తెగుళ్లు మరియు పురుగులు - నొక్కండి
                 </button>
             </div>
             <div>
@@ -203,7 +202,7 @@ export default function CropType() {
             <div className="flex items-center gap-2 mb-6 justify-center" >
 
                 <select value={growthStage} onChange={(e) => changeGrowthStage(e.target.value)}
-                    className="px-4 py-3 text-lg font-semibold  bg-white border border-gray-300 rounded-2xl shadow-md
+                    className="h-16 px-4 py-3 text-lg font-semibold  bg-white border border-gray-300 rounded-2xl shadow-md
                                        focus:outline-none  focus:ring-2 focus:ring-blue-500  focus:border-blue-500">
                     {Array.from(growthStages!.values()).map((element) => (
                         <option key={element} value={element}> {element} </option>
@@ -219,7 +218,7 @@ export default function CropType() {
             <div className="flex items-center gap-2 mb-6 justify-center" >
 
                 <select value={weather} onChange={(e) => changeWeather(e.target.value)}
-                    className="px-4 py-3 text-lg font-semibold  bg-white border border-gray-300 rounded-2xl shadow-md
+                    className="h-16 px-4 py-3 text-lg font-semibold  bg-white border border-gray-300 rounded-2xl shadow-md
                                        focus:outline-none  focus:ring-2 focus:ring-blue-500  focus:border-blue-500">
                     {Array.from(weathers!.values()).map((element) => (
                         <option key={element} value={element}> {element} </option>
@@ -227,22 +226,33 @@ export default function CropType() {
 
                 </select>
             </div>
-           
+
+
             {pestsLLMOutput &&
                 <div className="text-blue-700 bg-white rounded-lg shadow-md p-5 max-w-lg mx-auto"
                     style={{ marginTop: "10px" }}>
+
+                   {pestsLLMOutput.diseases.high_risk.length >= 1 &&
+                     <div className="text-red-700 font-semibold">తెగుళ్లు</div>}
                     {pestsLLMOutput.diseases.high_risk.map((disease) => (
                         <span key={disease.name}>
-                            <div>{disease.symptoms.join(".")}</div>
-                            <div>{disease.chemical_remediation.join(".")}</div>
-                            <div>{disease.organic_remediation.join(".")}</div>
+                            <div>పేరు : {disease.name}</div>
+                            <div>లక్షణాలు : {disease.symptoms.join(".")}</div>
+                            <div>రసాయన నివారణ : {disease.chemical_remediation.join(".")}</div>
+                            <div>సేంద్రీయ నివారణ : {disease.organic_remediation.join(".")}</div>
+                             <hr/>
                         </span>
+                       
                     ))}
+                     {pestsLLMOutput.pests.high_risk.length >= 1 &&
+                    <div className="text-red-700 font-semibold">పురుగులు</div> }
                     {pestsLLMOutput.pests.high_risk.map((pest) => (
                         <span key={pest.name}>
-                            <div>{pest.symptoms.join(".")}</div>
-                            <div>{pest.chemical_remediation.join(".")}</div>
-                            <div>{pest.organic_remediation.join(".")}</div>
+                            <div>పేరు : {pest.name}</div>
+                            <div>లక్షణాలు : {pest.symptoms.join(".")}</div>
+                            <div>రసాయన నివారణ : {pest.chemical_remediation.join(".")}</div>
+                            <div>సేంద్రీయ నివారణ : {pest.organic_remediation.join(".")}</div>
+                             <hr/>
                         </span>
 
                     ))}
