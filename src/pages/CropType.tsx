@@ -6,23 +6,27 @@ import type { CropProps } from "../models/agri";
 import { FaHome } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { fetchCropFertilizerSchedule, loadCropsAndReturnMap, parseLLMOutputAndFormat } from "../utils/utils";
+import { CROP_TYPES, MANGO_GROWTH_STAGES, MANGO_WEATHER, PADDY_GROWTH_STAGES, PADDY_WEATHER } from "../utils/constants";
 
 
 export default function CropType() {
 
-    const CROP_TYPES: string[] = ["వరి", "మామిడి"];
-     const [growthStage, setGrowthStage] = useState<string>("నారుమడి దశ ");
-     const [weather, setWeather] = useState<string>("ఎండ");
+    const [growthStage, setGrowthStage] = useState<string>("నారుమడి దశ ");
+    const [growthStages, setGrowthStages] = useState<string[]>(PADDY_GROWTH_STAGES);
+    const [weather, setWeather] = useState<string>("ఎండ");
+    const [weathers, setWeathers] = useState<string[]>(PADDY_WEATHER);
     const [cropType, setCropType] = useState<string>("వరి");
     const [cropSubType, setCropSubType] = useState<string>("సోనా మసూరి (BPT 3291)");
     const [cropSubTypes, setCropSubTypes] = useState<Map<string, CropProps>>(
         loadCropsAndReturnMap(cropTypes.types));
     const [paddyLLMOutput, setPaddyLLMOutput] = useState<Map<string, string[]> | null>(null);
     const [pestsLLMOutput, setPestsLLMOutput] = useState<Map<string, string[]> | null>(null);
-    
-    
+
+
     useEffect(() => {
         getSubTypesBasedOnCrop(cropType);
+        getGrowthStagesBasedOnCrop(cropType);
+        getWeatherBasedOnCrop(cropType);
     }, [cropType]);
 
     const getSubTypesBasedOnCrop = (cropType: string) => {
@@ -34,6 +38,25 @@ export default function CropType() {
             setCropSubType("సోనా మసూరి (BPT 3291)");
         }
     }
+    const getGrowthStagesBasedOnCrop = (cropType: string) => {
+        if (cropType === "మామిడి") {
+            setGrowthStages(MANGO_GROWTH_STAGES);
+            setGrowthStage("లేత మొక్క (0 నుండి 1 సంవత్సరం)");
+        } else {
+            setGrowthStages(PADDY_GROWTH_STAGES);
+            setGrowthStage("నారుమడి దశ");
+        }
+    }
+
+    const getWeatherBasedOnCrop = (cropType: string) => {
+        if (cropType === "మామిడి") {
+            setWeathers(MANGO_WEATHER);
+            setWeather("అకాల వర్షం");
+        } else {
+            setWeathers(PADDY_WEATHER);
+            setWeather("ఎండగా ఉండటం");
+        }
+    }
 
     const changeCropSubType = (selectedValue: string) => {
         setPaddyLLMOutput(null);
@@ -42,6 +65,30 @@ export default function CropType() {
     const changeCropType = (selectedValue: string) => {
         setPaddyLLMOutput(null);
         setCropType(selectedValue);
+    };
+    const changeGrowthStage = (selectedValue: string) => {
+        setPestsLLMOutput(null);
+        setGrowthStage(selectedValue);
+    };
+    const changeWeather = (selectedValue: string) => {
+        setPestsLLMOutput(null);
+        setWeather(selectedValue);
+    };
+
+    const fetchPestsAndDiseases = async () => {
+        try {
+            setPestsLLMOutput(null);
+            //TODO
+            const data = await fetchCropFertilizerSchedule(cropType, cropSubType);
+            if (!data) {
+                return;
+            }
+            //TODO
+            const pestsLLMOutput: Map<string, string[]> = parseLLMOutputAndFormat(data);
+            setPestsLLMOutput(pestsLLMOutput);
+        } catch (err) {
+            console.error(err);
+        }
     };
 
     const fetchFertilizerSchedule = async () => {
@@ -62,7 +109,7 @@ export default function CropType() {
         return timelineAndPhase.split("|")[0];
     }
 
-    function getTimeline(timelineAndPhase: string) : string {
+    function getTimeline(timelineAndPhase: string): string {
         return timelineAndPhase.split("|")[1];
     }
 
@@ -79,7 +126,7 @@ export default function CropType() {
                     <FaHome size={45} />
                 </Link>
             </div>
-             <div className="flex items-center gap-4 mb-6 justify-center" >
+            <div className="flex items-center gap-4 mb-6 justify-center" >
                 <label className="text-blue-700 text-s font-semibold whitespace-nowrap">
                     {"పంట : "}
                 </label>
@@ -89,7 +136,7 @@ export default function CropType() {
                     {Array.from(CROP_TYPES!.values()).map((element) => (
                         <option key={element} value={element}> {element} </option>
                     ))}
-                 
+
                 </select>
             </div>
             <div className="flex items-center gap-4 mb-6 justify-center" >
@@ -104,7 +151,7 @@ export default function CropType() {
                             {element.రకం}
                         </option>
                     ))}
-                 
+
                 </select>
             </div>
 
@@ -114,19 +161,19 @@ export default function CropType() {
                 <ElementTile element={cropSubTypes.get(cropSubType)} />
             </div>
             <div>
-                <button onClick={fetchFertilizerSchedule} style={{ marginTop: "10px"}}
-                className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg shadow">
-                    ఎరువుల యాజమాన్యం (ఎకరానికి) చూడండి
+                <button onClick={fetchFertilizerSchedule} style={{ marginTop: "10px" }}
+                    className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg shadow">
+                    ఎరువుల యాజమాన్యం (ఎకరానికి) - చూడండి
                 </button></div>
 
             {paddyLLMOutput &&
                 <div className="text-blue-700 bg-white rounded-lg shadow-md p-5 max-w-lg mx-auto"
                     style={{ marginTop: "10px" }}>
                     {[...paddyLLMOutput.entries()].map(([timeline, fertilizers]) => (
-                        <div key={timeline} style={{ marginBottom: "10px"}}>
-                       { cropType === "మామిడి" &&    
-                       <span className="text-red-700 font-bold">{getPhase(timeline)}</span>
-                          }   <span className="text-red-700 font-bold">{getTimeline(timeline)}</span>
+                        <div key={timeline} style={{ marginBottom: "10px" }}>
+                            {cropType === "మామిడి" &&
+                                <span className="text-red-700 font-bold">{getPhase(timeline)}</span>
+                            }   <span className="text-red-700 font-bold">{getTimeline(timeline)}</span>
                             <span>
                                 {fertilizers.map((item) => (
                                     <div key={item}>
@@ -139,6 +186,37 @@ export default function CropType() {
                     ))}
                 </div>
             }
+            <div>
+                <button onClick={fetchPestsAndDiseases} style={{ marginTop: "10px" }}
+                    className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg shadow">
+                    పురుగులు మరియు తెగుళ్లు - చూడండి
+                </button></div>
+            <div className="flex items-center gap-4 mb-6 justify-center" >
+                <label className="text-blue-700 text-s font-semibold whitespace-nowrap">
+                    {"పంట దశ : "}
+                </label>
+                <select value={growthStage} onChange={(e) => changeGrowthStage(e.target.value)}
+                    className="px-4 py-3 text-lg font-semibold  bg-white border border-gray-300 rounded-2xl shadow-md
+                                       focus:outline-none  focus:ring-2 focus:ring-blue-500  focus:border-blue-500">
+                    {Array.from(growthStages!.values()).map((element) => (
+                        <option key={element} value={element}> {element} </option>
+                    ))}
+
+                </select>
+            </div>
+            <div className="flex items-center gap-4 mb-6 justify-center" >
+                <label className="text-blue-700 text-s font-semibold whitespace-nowrap">
+                    {"వాతావరణం : "}
+                </label>
+                <select value={weather} onChange={(e) => changeWeather(e.target.value)}
+                    className="px-4 py-3 text-lg font-semibold  bg-white border border-gray-300 rounded-2xl shadow-md
+                                       focus:outline-none  focus:ring-2 focus:ring-blue-500  focus:border-blue-500">
+                    {Array.from(weathers!.values()).map((element) => (
+                        <option key={element} value={element}> {element} </option>
+                    ))}
+
+                </select>
+            </div>
 
         </div>
 
