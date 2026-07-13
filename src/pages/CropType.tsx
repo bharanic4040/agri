@@ -11,7 +11,7 @@ import { CROP_TYPES, MANGO_GROWTH_STAGES, MANGO_WEATHER, PADDY_GROWTH_STAGES, PA
 
 export default function CropType() {
 
-    const [growthStage, setGrowthStage] = useState<string>("నారుమడి దశ ");
+    const [growthStage, setGrowthStage] = useState<string>("నారుమడి దశ");
     const [growthStages, setGrowthStages] = useState<string[]>(PADDY_GROWTH_STAGES);
     const [weather, setWeather] = useState<string>("ఎండ");
     const [weathers, setWeathers] = useState<string[]>(PADDY_WEATHER);
@@ -78,8 +78,7 @@ export default function CropType() {
     const fetchPestsAndDiseases = async () => {
         try {
             setPestsLLMOutput(null);
-            //TODO
-            const data = await fetchCropFertilizerSchedule(cropType, cropSubType);
+            const data = await fetchPestsAndDiseases(cropType, cropSubType, "pests", weather, growthStage);
             if (!data) {
                 return;
             }

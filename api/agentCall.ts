@@ -20,14 +20,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     let bodyPostForGeminiLLM = {};
     if (queryType === "fertilizer") {
-       bodyPostForGeminiLLM = createGeminiLLMBodyForPaddy(cropType, cropSubType);
+      bodyPostForGeminiLLM = createGeminiLLMBodyForPaddy(cropType, cropSubType);
     } else if (queryType === "pests") {
       if (cropType === "మామిడి") {
-         bodyPostForGeminiLLM = createLLMBodyForPestAndDiseasesMango(growthStage, cropSubType, weather);
+        bodyPostForGeminiLLM = createLLMBodyForPestAndDiseasesMango(growthStage, cropSubType, weather);
       } else {
-          bodyPostForGeminiLLM = createLLMBodyForPestAndDiseasesPaddy(growthStage, cropSubType, weather);
+        bodyPostForGeminiLLM = createLLMBodyForPestAndDiseasesPaddy(growthStage, cropSubType, weather);
       }
-    
+
     }
 
     const response = await axios.post(
@@ -162,9 +162,9 @@ function createGeminiLLMBodyForPaddy(CROP_TYPE: string, CROP_SUB_TYPE: string) {
 
 
 function createLLMBodyForPestAndDiseasesPaddy(growthStage: string, cropSubType: string,
-   weather: string) {
+  weather: string) {
   const PADDY_USER_PROMPT = `Paddy Variety: ${cropSubType}, Crop Growth Stage: ${growthStage} , Current Weather: ${weather}`;
-  
+
   const bodyPostForGeminiLLM = {
     "systemInstruction": {
       "parts": [
@@ -189,13 +189,13 @@ function createLLMBodyForPestAndDiseasesPaddy(growthStage: string, cropSubType: 
   }
 
   return bodyPostForGeminiLLM
- }
+}
 
 function createLLMBodyForPestAndDiseasesMango(growthStage: string, cropSubType: string,
-   weather: string) {
-  
+  weather: string) {
+
   const MANGO_USER_PROMPT = `Please generate a dynamic mango health report based on the specific variety, tree age, and environmental factors provided below. Ensure the output strictly follows the required JSON format and is written entirely in Telugu. Mango Variety: ${cropSubType}, Phenological Growth:${growthStage}, Current Weather Conditions:${weather}`;
-  
+
   const bodyPostForGeminiLLM = {
     "systemInstruction": {
       "parts": [

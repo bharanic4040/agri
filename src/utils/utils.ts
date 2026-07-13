@@ -1,5 +1,5 @@
 
-import type { CropProps, FertilizerScheduleResponse, Loc } from "../models/agri";
+import type { CropProps, FertilizerScheduleResponse, Loc, MangoDiagnosis, PaddyDiagnosis } from "../models/agri";
 
 export function loadCropsAndReturnMap(cropTypesArray: CropProps[]): Map<string, CropProps> {
   const dictionaryMap = new Map<string, CropProps>();
@@ -130,7 +130,8 @@ export async function fetchCropFertilizerSchedule(
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ cropType, cropSubType }),
+      body: JSON.stringify({ cropType, cropSubType, queryType: "fertilizer", 
+        weather:"", growthStage: "" }),
     });
 
     if (!res.ok) {
@@ -142,5 +143,30 @@ export async function fetchCropFertilizerSchedule(
     console.error(err);
   }
   return null;
-
 }
+
+export async function fetchPestsAndDiseases(
+  cropType: string, cropSubType: string, queryType: string,
+   weather: string, growthStage: string 
+): Promise<MangoDiagnosis | PaddyDiagnosis | null> {
+
+  try {
+    const res = await fetch("/api/agentCall", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ cropType, cropSubType, queryType, weather, growthStage }),
+    });
+
+    if (!res.ok) {
+      return null;
+    }
+    const data: MangoDiagnosis | PaddyDiagnosis =  await res.json();
+    return data;
+  } catch (err) {
+    console.error(err);
+  }
+  return null;
+}
+
