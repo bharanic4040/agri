@@ -44,3 +44,44 @@ export interface Fertilizer {
   name?: string | null;
   quantity_kg_per_acre?: number | null;
 }
+
+/* pests and diseases schema */
+export interface RiskItem {
+  name: string;
+  symptoms: string[];
+  organic_remediation: string[];
+  chemical_remediation: string[];
+}
+
+export interface LowRiskItem {
+  name: string;
+  reason_for_low_risk: string;
+}
+
+export interface RiskCategory {
+  high_risk: RiskItem[];
+  low_risk_or_resistant: LowRiskItem[];
+}
+
+export interface MangoDiagnosis {
+  mango_variety: string;
+  tree_age: string;
+  current_weather: string;
+
+  diseases: RiskCategory;
+  pests: RiskCategory;
+
+  weather_and_age_specific_advice: string[];
+}
+
+export interface PaddyDiagnosis {
+  paddy_variety: string;
+  crop_growth_stage: string;
+  current_weather: string;
+
+  diseases: RiskCategory;
+  pests: RiskCategory;
+
+  weather_and_stage_specific_advice: string[];
+}
+/* ends */

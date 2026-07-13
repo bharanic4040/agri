@@ -11,11 +11,15 @@ import { fetchCropFertilizerSchedule, loadCropsAndReturnMap, parseLLMOutputAndFo
 export default function CropType() {
 
     const CROP_TYPES: string[] = ["వరి", "మామిడి"];
-     const [cropType, setCropType] = useState<string>("వరి");
+     const [growthStage, setGrowthStage] = useState<string>("నారుమడి దశ ");
+     const [weather, setWeather] = useState<string>("ఎండ");
+    const [cropType, setCropType] = useState<string>("వరి");
     const [cropSubType, setCropSubType] = useState<string>("సోనా మసూరి (BPT 3291)");
     const [cropSubTypes, setCropSubTypes] = useState<Map<string, CropProps>>(
         loadCropsAndReturnMap(cropTypes.types));
     const [paddyLLMOutput, setPaddyLLMOutput] = useState<Map<string, string[]> | null>(null);
+    const [pestsLLMOutput, setPestsLLMOutput] = useState<Map<string, string[]> | null>(null);
+    
     
     useEffect(() => {
         getSubTypesBasedOnCrop(cropType);
