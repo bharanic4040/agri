@@ -60,10 +60,12 @@ export default function CropType() {
 
     const changeCropSubType = (selectedValue: string) => {
         setPaddyLLMOutput(null);
+        setPestsLLMOutput(null);
         setCropSubType(selectedValue);
     };
     const changeCropType = (selectedValue: string) => {
         setPaddyLLMOutput(null);
+        setPestsLLMOutput(null);
         setCropType(selectedValue);
     };
     const changeGrowthStage = (selectedValue: string) => {
