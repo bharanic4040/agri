@@ -12,6 +12,8 @@ import { CROP_TYPES, MANGO_GROWTH_STAGES, MANGO_WEATHER, PADDY_GROWTH_STAGES, PA
 export default function CropType() {
 
     const [growthStage, setGrowthStage] = useState<string>("నారుమడి దశ");
+     const [isFertilizerLoading, setIsFertilizerLoading] = useState<boolean>(false);
+     const [isPestsLoading, setIsPestsLoading] = useState<boolean>(false);
     const [growthStages, setGrowthStages] = useState<string[]>(PADDY_GROWTH_STAGES);
     const [weather, setWeather] = useState<string>("ఎండ");
     const [weathers, setWeathers] = useState<string[]>(PADDY_WEATHER);
@@ -79,6 +81,7 @@ export default function CropType() {
 
     const fetchPestsAndDiseases = async () => {
         try {
+            setIsPestsLoading(true);
             setPestsLLMOutput(null);
             const data: MangoDiagnosis | PaddyDiagnosis | null
                 = await fetchPests(cropType, cropSubType, "pests", weather, growthStage);
@@ -89,10 +92,12 @@ export default function CropType() {
         } catch (err) {
             console.error(err);
         }
+         setIsPestsLoading(false);
     };
 
     const fetchFertilizerSchedule = async () => {
         try {
+            setIsFertilizerLoading(true);
             setPaddyLLMOutput(null);
             const data = await fetchCropFertilizerSchedule(cropType, cropSubType);
             if (!data) {
@@ -103,6 +108,7 @@ export default function CropType() {
         } catch (err) {
             console.error(err);
         }
+         setIsFertilizerLoading(false);
     };
 
     function getPhase(timelineAndPhase: string): string {
@@ -160,11 +166,18 @@ export default function CropType() {
                 style={{ marginTop: "10px" }}>
                 <ElementTile element={cropSubTypes.get(cropSubType)} />
             </div>
-            <div>
-                <button onClick={fetchFertilizerSchedule} style={{ marginTop: "10px" }}
+            <div style={{ marginTop: "10px" }}>
+                <button onClick={fetchFertilizerSchedule} 
                     className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg shadow">
                     ఎరువుల యాజమాన్యం (ఎకరానికి) - నొక్కండి
-                </button></div>
+                </button>
+                {isFertilizerLoading && (
+  <div className="flex justify-center items-center py-4">
+    <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-blue-600"></div>
+  </div>
+)}
+                </div>
+
 
             {paddyLLMOutput &&
                 <div className="text-blue-700 bg-white rounded-lg shadow-md p-5 max-w-lg mx-auto"
@@ -190,11 +203,16 @@ export default function CropType() {
                 <hr />
             </div>
 
-            <div>
-                <button onClick={fetchPestsAndDiseases} style={{ marginTop: "20px", marginBottom: "5px" }}
+            <div  style={{ marginTop: "20px", marginBottom: "5px" }}>
+                <button onClick={fetchPestsAndDiseases}
                     className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg shadow">
                     తెగుళ్లు మరియు పురుగులు - నొక్కండి
                 </button>
+                        {isPestsLoading && (
+  <div className="flex justify-center items-center py-4">
+    <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-blue-600"></div>
+  </div>
+)}
             </div>
             <div>
                 <label className="text-blue-700 text-s font-semibold whitespace-nowrap">
