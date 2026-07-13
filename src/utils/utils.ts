@@ -31,6 +31,21 @@ export function parseLLMOutputAndFormat(paddyOutput: FertilizerScheduleResponse)
   return cropMap;
 }
 
+  /*
+  paddyOutput.schedule?.forEach((schedule, _) => {
+    if (!schedule.timeline || !schedule.fertilizers || schedule.fertilizers?.length === 0) {
+      return;
+    }
+    let fertArray: string[] = [];
+    schedule.fertilizers?.forEach((fertilizer, _) => {
+      const fertItem = fertilizer.name + " - " + fertilizer.quantity_kg_per_acre + " KG."
+      fertArray.push(fertItem);
+    });
+    cropMap.set(schedule.phase + "|" +schedule.timeline, fertArray);
+  });*/
+
+ 
+
 /*
 ===================
 You can make the forecast more useful by requesting additional fields such as:
@@ -145,7 +160,7 @@ export async function fetchCropFertilizerSchedule(
   return null;
 }
 
-export async function fetchPestsAndDiseases(
+export async function fetchPests(
   cropType: string, cropSubType: string, queryType: string,
    weather: string, growthStage: string 
 ): Promise<MangoDiagnosis | PaddyDiagnosis | null> {

@@ -2,10 +2,10 @@ import { Link } from "react-router-dom";
 import ElementTile from "../components/ElementTile";
 import cropTypes from "../data/paddy-type.json";
 import mangoCropTypes from "../data/mango-type.json";
-import type { CropProps } from "../models/agri";
+import type { CropProps, MangoDiagnosis, PaddyDiagnosis } from "../models/agri";
 import { FaHome } from "react-icons/fa";
 import { useEffect, useState } from "react";
-import { fetchCropFertilizerSchedule, loadCropsAndReturnMap, parseLLMOutputAndFormat } from "../utils/utils";
+import { fetchCropFertilizerSchedule, fetchPests, loadCropsAndReturnMap, parseLLMOutputAndFormat } from "../utils/utils";
 import { CROP_TYPES, MANGO_GROWTH_STAGES, MANGO_WEATHER, PADDY_GROWTH_STAGES, PADDY_WEATHER } from "../utils/constants";
 
 
@@ -20,7 +20,7 @@ export default function CropType() {
     const [cropSubTypes, setCropSubTypes] = useState<Map<string, CropProps>>(
         loadCropsAndReturnMap(cropTypes.types));
     const [paddyLLMOutput, setPaddyLLMOutput] = useState<Map<string, string[]> | null>(null);
-    const [pestsLLMOutput, setPestsLLMOutput] = useState<Map<string, string[]> | null>(null);
+    const [pestsLLMOutput, setPestsLLMOutput] = useState<MangoDiagnosis | PaddyDiagnosis | null>(null);
 
 
     useEffect(() => {
@@ -78,13 +78,13 @@ export default function CropType() {
     const fetchPestsAndDiseases = async () => {
         try {
             setPestsLLMOutput(null);
-            const data = await fetchPestsAndDiseases(cropType, cropSubType, "pests", weather, growthStage);
+            const data: MangoDiagnosis | PaddyDiagnosis | null
+                = await fetchPests(cropType, cropSubType, "pests", weather, growthStage);
             if (!data) {
                 return;
             }
-            //TODO
-            const pestsLLMOutput: Map<string, string[]> = parseLLMOutputAndFormat(data);
-            setPestsLLMOutput(pestsLLMOutput);
+            console.log("PESTS" + data);
+            setPestsLLMOutput(data);
         } catch (err) {
             console.error(err);
         }
@@ -185,15 +185,23 @@ export default function CropType() {
                     ))}
                 </div>
             }
-            <div>
-                <button onClick={fetchPestsAndDiseases} style={{ marginTop: "10px" }}
+            <div  style={{ marginTop: "20px" }}>
+ <hr />
+            </div>
+           
+             <div>
+                <button onClick={fetchPestsAndDiseases} style={{ marginTop: "20px", marginBottom: "5px" }}
                     className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg shadow">
                     పురుగులు మరియు తెగుళ్లు - చూడండి
-                </button></div>
-            <div className="flex items-center gap-4 mb-6 justify-center" >
+                </button>
+            </div>
+            <div>
                 <label className="text-blue-700 text-s font-semibold whitespace-nowrap">
                     {"పంట దశ : "}
                 </label>
+            </div>
+            <div className="flex items-center gap-2 mb-6 justify-center" >
+
                 <select value={growthStage} onChange={(e) => changeGrowthStage(e.target.value)}
                     className="px-4 py-3 text-lg font-semibold  bg-white border border-gray-300 rounded-2xl shadow-md
                                        focus:outline-none  focus:ring-2 focus:ring-blue-500  focus:border-blue-500">
@@ -203,10 +211,13 @@ export default function CropType() {
 
                 </select>
             </div>
-            <div className="flex items-center gap-4 mb-6 justify-center" >
+            <div>
                 <label className="text-blue-700 text-s font-semibold whitespace-nowrap">
                     {"వాతావరణం : "}
                 </label>
+            </div>
+            <div className="flex items-center gap-2 mb-6 justify-center" >
+
                 <select value={weather} onChange={(e) => changeWeather(e.target.value)}
                     className="px-4 py-3 text-lg font-semibold  bg-white border border-gray-300 rounded-2xl shadow-md
                                        focus:outline-none  focus:ring-2 focus:ring-blue-500  focus:border-blue-500">
@@ -216,6 +227,27 @@ export default function CropType() {
 
                 </select>
             </div>
+           
+            {pestsLLMOutput &&
+                <div className="text-blue-700 bg-white rounded-lg shadow-md p-5 max-w-lg mx-auto"
+                    style={{ marginTop: "10px" }}>
+                    {pestsLLMOutput.diseases.high_risk.map((disease) => (
+                        <span key={disease.name}>
+                            <div>{disease.symptoms.join(".")}</div>
+                            <div>{disease.chemical_remediation.join(".")}</div>
+                            <div>{disease.organic_remediation.join(".")}</div>
+                        </span>
+                    ))}
+                    {pestsLLMOutput.pests.high_risk.map((pest) => (
+                        <span key={pest.name}>
+                            <div>{pest.symptoms.join(".")}</div>
+                            <div>{pest.chemical_remediation.join(".")}</div>
+                            <div>{pest.organic_remediation.join(".")}</div>
+                        </span>
+
+                    ))}
+                </div>
+            }
 
         </div>
 
