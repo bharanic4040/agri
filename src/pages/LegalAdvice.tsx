@@ -8,7 +8,7 @@ import { fetchLawDetails } from "../utils/utils";
 export default function CropType() {
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [userQuery, setUserQuery] = useState<string>("మీ సమస్యను వివరించండి...");
+    const [userQuery, setUserQuery] = useState<string>("");
     const [lawOutput, setLawOutput] = useState<LegalAdviceResponse | null>(null);
 
     useEffect(() => {}, []);
@@ -20,7 +20,7 @@ export default function CropType() {
         try {
             setIsLoading(true);
             setLawOutput(null);
-            if (userQuery.trim() === "" || userQuery === "మీ సమస్యను వివరించండి..." || userQuery.trim().length >= 100) {
+            if (userQuery.trim() === "" || userQuery.trim().length >= 100) {
                 return;
             }
             const data = await fetchLawDetails(userQuery.trim());
@@ -47,10 +47,11 @@ export default function CropType() {
                     <FaHome size={45} />
                 </Link>
             </div>
+              <div className="text-red-700 font-semibold">మీ సమస్యను వివరించండి</div> 
             <div style={{ marginTop: "10px" }}>
                 <textarea
   rows={3}
-  placeholder="మీ సమస్యను వివరించండి..."
+  placeholder=""
   value={userQuery}
  onChange={(e) => setUserQuery(e.target.value)}
   className="
@@ -89,8 +90,6 @@ export default function CropType() {
             {lawOutput &&
                 <div className="text-blue-700 bg-white rounded-lg shadow-md p-5 max-w-lg mx-auto"
                     style={{ marginTop: "10px" }}>
-                        <div className="text-red-700 font-semibold">మీ సమస్య</div> 
-                     <div>{userQuery}</div>    <hr />
                       <div className="text-red-700 font-semibold">సమస్య విశ్లేషణ</div> 
                     <div>{lawOutput["సమస్య విశ్లేషణ"]}</div>
                     <hr />
