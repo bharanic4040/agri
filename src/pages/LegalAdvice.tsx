@@ -8,7 +8,7 @@ import { fetchLawDetails } from "../utils/utils";
 export default function CropType() {
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [userQuery, setUserQuery] = useState<string | null>(null);
+    const [userQuery, setUserQuery] = useState<string>("మీ సమస్యను వివరించండి...");
     const [lawOutput, setLawOutput] = useState<LegalAdviceResponse | null>(null);
 
     useEffect(() => {}, []);
@@ -20,8 +20,10 @@ export default function CropType() {
         try {
             setIsLoading(true);
             setLawOutput(null);
-            setUserQuery("నా సోదరి నా పత్రాలను ఫోర్జరీ చేసింది");
-            const data = await fetchLawDetails("నా సోదరి నా పత్రాలను ఫోర్జరీ చేసింది");
+            if (userQuery.trim() === "" || userQuery === "మీ సమస్యను వివరించండి..." || userQuery.trim().length >= 100) {
+                return;
+            }
+            const data = await fetchLawDetails(userQuery.trim());
             if (!data) {
                 return;
             }
@@ -44,6 +46,31 @@ export default function CropType() {
                 <Link to="/">
                     <FaHome size={45} />
                 </Link>
+            </div>
+            <div style={{ marginTop: "10px" }}>
+                <textarea
+  rows={3}
+  placeholder="మీ సమస్యను వివరించండి..."
+  value={userQuery}
+ onChange={(e) => setUserQuery(e.target.value)}
+  className="
+    w-full
+    rounded-xl
+    border border-gray-300
+    bg-white
+    px-4 py-3
+    text-gray-800
+    placeholder:text-gray-400
+    shadow-sm
+    resize-none
+    transition
+    duration-200
+    focus:border-red-600
+    focus:ring-2
+    focus:ring-red-200
+    focus:outline-none
+  "
+/>
             </div>
 
             <div style={{ marginTop: "10px" }}>
@@ -68,7 +95,7 @@ export default function CropType() {
                     <div>{lawOutput["సమస్య విశ్లేషణ"]}</div>
                     <hr />
                      {lawOutput["సంబంధిత చట్టాలు మరియు సెక్షన్లు"].length >= 1 &&
-                     <div className="text-red-700 font-semibold">శసంబంధిత చట్టాలు మరియు సెక్షన్లు</div>}
+                     <div className="text-red-700 font-semibold">సంబంధిత చట్టాలు మరియు సెక్షన్లు</div>}
                     {lawOutput["సంబంధిత చట్టాలు మరియు సెక్షన్లు"].map((item) => (
                         <div key={item}>{item}</div>
                     ))}
@@ -91,6 +118,8 @@ export default function CropType() {
                         <div key={item}>{item}</div>
                     ))}
                     <hr />
+                    
+                      <div className="text-red-700 font-semibold">ముఖ్య గమనిక</div> 
                     <div>ఈ సమాచారం కేవలం అవగాహన కోసం మాత్రమే. ఇది వృత్తిపరమైన న్యాయ సలహాకు ప్రత్యామ్నాయం కాదు. మీ కేసు యొక్క ప్రత్యేక పరిస్థితులను బట్టి న్యాయ సలహా మారుతుంది, కాబట్టి దయచేసి ఒక అర్హత కలిగిన న్యాయవాదిని సంప్రదించండి.</div>
 
 
