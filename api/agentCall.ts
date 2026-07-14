@@ -1,5 +1,6 @@
 import axios from "axios";
 import type { VercelRequest, VercelResponse } from "@vercel/node";
+import { neon } from "@neondatabase/serverless";
 
 const GEMINI_FLASH_LITE_BASE_URL =
   "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent";
@@ -30,17 +31,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     }
 
-    const response = await axios.post(
-      `${GEMINI_FLASH_LITE_BASE_URL}?key=${process.env.GOOGLE_GEMINI_KEY}`,
-      bodyPostForGeminiLLM,
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-    const result = response.data;
-    const text = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+    let text = null;
+
+    const data = await checkInDB({ cropType, cropSubType, growthStage, weather });
+    if (data) {
+      return data;
+    } else {
+      text = await makeLLMCall(bodyPostForGeminiLLM);
+      updateInDB({ cropType, cropSubType, growthStage, weather }, text)
+    }
+
+
+
+
 
     if (!text) {
       return res.status(500).json({
@@ -56,6 +59,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 }
 
+async function makeLLMCall(bodyPostForGeminiLLM: any): Promise<string | null> {
+  const response = await axios.post(
+    `${GEMINI_FLASH_LITE_BASE_URL}?key=${process.env.GOOGLE_GEMINI_KEY}`,
+    bodyPostForGeminiLLM,
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  const result = response.data;
+  const text = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+  return text;
+}
 function createGeminiLLMBodyForPaddy(CROP_TYPE: string, CROP_SUB_TYPE: string) {
   let MANGO_USER_PROMPT = `Generate a comprehensive fertilizer schedule for a ${CROP_SUB_TYPE} ${CROP_TYPE} orchard. Context: Assume standard soil test values (medium fertility). Provide the dosage per tree (and total per acre based on 80–110 trees/acre spacing) using standard straight fertilizers: Urea, Single Super Phosphate (SSP), and Muriate of Potash (MOP). Structure the output into clear timeline phases spanning Tree Age Tiers (Year 1, Annual Increments for Years 2–9, and Fully Bearing Year 10+ onwards). For the fully bearing years, divide the annual nutrition into a split application timeline: Phase 1: Post-Harvest / Early Monsoon (June–July - 50% N, 100% P, 50% K) and Phase 2: Post-Monsoon / Pre-Bud Break (September–October - remaining 50% N, 50% K). Explicitly include safety warnings against late nitrogen application near flowering, along with critical trace mineral foliar sprays (Zinc, Boron) to prevent fruit cracking and ensure maximum sugar development`;
   let PADDY_USER_PROMPT = `Generate a comprehensive fertilizer schedule for ${CROP_SUB_TYPE} ${CROP_TYPE} crop. Context: Assume standard standard soil test values (medium fertility). Provide the dosage per acre using standard fertilizers: Urea, Single Super Phosphate, and Muriate of Potash. Split the schedule into clear timeline phases: Basal, Tillering, Panicle Initiation, and Flowering/Heading.`;
@@ -220,3 +237,58 @@ function createLLMBodyForPestAndDiseasesMango(growthStage: string, cropSubType: 
   }
   return bodyPostForGeminiLLM;
 }
+
+
+async function checkInDB(params: CropParams) {
+  const databaseUrl = process.env.DATABASE_URL;
+  if (!databaseUrl) {
+    console.error("DATABASE_URL is not set");
+    return null;
+  }
+  try {
+    const sql = neon(databaseUrl);
+    const rows = await sql`
+SELECT response FROM fertilizer_cache WHERE crop_type=${params.cropType}
+AND crop_sub_type=${params.cropSubType} AND expires_at > NOW()
+`;
+    if (rows.length) {
+      return rows[0].response;
+    }
+  } catch (err) {
+    console.error("DB Select error - " + err);
+  }
+  return null;
+}
+
+
+async function updateInDB(params: CropParams, llmResponse: any) {
+  const databaseUrl = process.env.DATABASE_URL;
+  if (!databaseUrl) {
+    console.error("DATABASE_URL is not set");
+    return;
+  }
+  try {
+    const sql = neon(databaseUrl);
+
+    await sql`
+INSERT INTO fertilizer_cache(crop_type, crop_sub_type, response, expires_at)
+VALUES( ${params.cropType}, ${params.cropSubType},${JSON.stringify(llmResponse)},
+ NOW() + INTERVAL '60 days')
+ON CONFLICT(crop_type,crop_sub_type)
+DO UPDATE SET
+    response = EXCLUDED.response,
+    expires_at = EXCLUDED.expires_at;
+`;
+  } catch (err) {
+    console.error("DB Select error - " + err);
+  }
+}
+
+
+export interface CropParams {
+  cropType: string;
+  cropSubType: string;
+  growthStage?: string | null;
+  weather?: string | string;
+}
+

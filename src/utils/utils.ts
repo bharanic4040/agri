@@ -1,4 +1,3 @@
-
 import type { CropProps, FertilizerScheduleResponse, Loc, MangoDiagnosis, PaddyDiagnosis } from "../models/agri";
 
 export function loadCropsAndReturnMap(cropTypesArray: CropProps[]): Map<string, CropProps> {
@@ -146,7 +145,7 @@ export async function fetchCropFertilizerSchedule(
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ cropType, cropSubType, queryType: "fertilizer", 
-        weather:"", growthStage: "" }),
+        weather: null, growthStage: null }),
     });
 
     if (!res.ok) {
