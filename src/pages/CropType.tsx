@@ -64,22 +64,33 @@ export default function CropType() {
         setPaddyLLMOutput(null);
         setPestsLLMOutput(null);
         setCropSubType(selectedValue);
+        setIsFertilizerLoading(false);
+        setIsPestsLoading(false);
     };
     const changeCropType = (selectedValue: string) => {
         setPaddyLLMOutput(null);
         setPestsLLMOutput(null);
+        setIsFertilizerLoading(false);
+        setIsPestsLoading(false);
         setCropType(selectedValue);
     };
     const changeGrowthStage = (selectedValue: string) => {
         setPestsLLMOutput(null);
         setGrowthStage(selectedValue);
+        setIsFertilizerLoading(false);
+        setIsPestsLoading(false);
     };
     const changeWeather = (selectedValue: string) => {
         setPestsLLMOutput(null);
         setWeather(selectedValue);
+        setIsFertilizerLoading(false);
+        setIsPestsLoading(false);
     };
 
     const fetchPestsAndDiseases = async () => {
+        if (isPestsLoading) {
+            return;
+        }
         try {
             setIsPestsLoading(true);
             setPestsLLMOutput(null);
@@ -96,6 +107,9 @@ export default function CropType() {
     };
 
     const fetchFertilizerSchedule = async () => {
+        if (isFertilizerLoading) {
+            return;
+        }
         try {
             setIsFertilizerLoading(true);
             setPaddyLLMOutput(null);

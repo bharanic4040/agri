@@ -43,7 +43,8 @@ export default function Home() {
 
       </div>
       <div className="text-blue-700">
-        <div className="font-bold">వాతావరణం</div>
+        <div className="font-bold text-red-800">వాతావరణం</div>
+        <div className="font-semibold">వాతావరణ సమాచారాన్ని పొందడానికి దయచేసి మీ ఫోన్‌లో లొకేషన్‌ను ఆన్ చేయండి.</div>
         <table className="min-w-full border border-gray-300 rounded-lg overflow-hidden">
           <thead className="bg-blue-700 text-white">
             <tr>
@@ -81,7 +82,7 @@ export default function Home() {
           color: "#fbbf24",
         }}
       >
-        💬 సూచనలు bharanic404@gmail.com
+        💬 అభిప్రాయం కోసం bharanic404@gmail.com
       </div>
 
     </>
