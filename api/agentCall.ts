@@ -30,17 +30,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       } else {
         bodyPostForGeminiLLM = createLLMBodyForPestAndDiseasesPaddy(growthStage, cropSubType, weather);
       }
-
     }
-
     let text = null;
-
     const data = await checkInDB({ cropType, cropSubType, growthStage, weather, queryType });
     if (data) {
       text = data;
     } else {
       text = await makeLLMCall(bodyPostForGeminiLLM);
-      updateInDB({ cropType, cropSubType, growthStage, weather, queryType }, text)
+      await updateInDB({ cropType, cropSubType, growthStage, weather, queryType }, text)
     }
     if (!text) {
       return res.status(500).json({
@@ -72,7 +69,7 @@ async function makeLLMCall(bodyPostForGeminiLLM: any): Promise<string | null> {
 }
 
 function createGeminiLLMBodyForPaddy(CROP_TYPE: string, CROP_SUB_TYPE: string) {
-  
+
   let MANGO_USER_PROMPT = `Generate a comprehensive fertilizer schedule for a ${CROP_SUB_TYPE} ${CROP_TYPE} orchard. Context: Assume standard soil test values (medium fertility). Provide the dosage per tree (and total per acre based on 80–110 trees/acre spacing) using standard straight fertilizers: Urea, Single Super Phosphate (SSP), and Muriate of Potash (MOP). Structure the output into clear timeline phases spanning Tree Age Tiers (Year 1, Annual Increments for Years 2–9, and Fully Bearing Year 10+ onwards). For the fully bearing years, divide the annual nutrition into a split application timeline: Phase 1: Post-Harvest / Early Monsoon (June–July - 50% N, 100% P, 50% K) and Phase 2: Post-Monsoon / Pre-Bud Break (September–October - remaining 50% N, 50% K). Explicitly include safety warnings against late nitrogen application near flowering, along with critical trace mineral foliar sprays (Zinc, Boron) to prevent fruit cracking and ensure maximum sugar development`;
   let PADDY_USER_PROMPT = `Generate a comprehensive fertilizer schedule for ${CROP_SUB_TYPE} ${CROP_TYPE} crop. Context: Assume standard standard soil test values (medium fertility). Provide the dosage per acre using standard fertilizers: Urea, Single Super Phosphate, and Muriate of Potash. Split the schedule into clear timeline phases: Basal, Tillering, Panicle Initiation, and Flowering/Heading.`;
 
@@ -280,18 +277,19 @@ async function updateInDB(params: CropParams, llmResponse: any) {
     if (params.queryType === "fertilizer") {
       await sql`
 INSERT INTO fertilizer_cache(crop_type, crop_sub_type, response, expires_at)
-VALUES( ${params.cropType}, ${params.cropSubType},${JSON.stringify(llmResponse)},
+VALUES( ${params.cropType}, ${params.cropSubType}, ${llmResponse},
  NOW() + INTERVAL '60 days')
-ON CONFLICT(crop_type,crop_sub_type)
+ON CONFLICT(crop_type, crop_sub_type)
 DO UPDATE SET response = EXCLUDED.response, expires_at = EXCLUDED.expires_at;
 `;
     } else {
       await sql`
-INSERT INTO pests_cache(crop_type, crop_sub_type, response, expires_at)
+INSERT INTO pests_cache(crop_type, crop_sub_type, growthStage,
+weather, response, expires_at)
 VALUES( ${params.cropType}, ${params.cropSubType},${params.growthStage},
- ${params.weather}, ${JSON.stringify(llmResponse)},
+ ${params.weather}, ${llmResponse},
  NOW() + INTERVAL '60 days')
-ON CONFLICT(crop_type,crop_sub_type)
+ON CONFLICT(crop_type, crop_sub_type, growthStage, weather)
 DO UPDATE SET response = EXCLUDED.response, expires_at = EXCLUDED.expires_at;`;
     }
 
