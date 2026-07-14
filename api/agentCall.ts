@@ -236,7 +236,7 @@ function createLLMBodyForPestAndDiseasesMango(growthStage: string, cropSubType: 
 
 
 async function checkInDB(params: CropParams) {
-  const databaseUrl = process.env.DATABASE_URL;
+  const databaseUrl = process.env.AGRI_DATABASE_URL;
   if (!databaseUrl) {
     console.error("DATABASE_URL is not set");
     return null;
@@ -267,7 +267,7 @@ AND crop_sub_type=${params.cropSubType} AND growth_stage=${params.growthStage} A
 
 
 async function updateInDB(params: CropParams, llmResponse: any) {
-  const databaseUrl = process.env.DATABASE_URL;
+  const databaseUrl = process.env.AGRI_DATABASE_URL;
   if (!databaseUrl) {
     console.error("DATABASE_URL is not set");
     return;
