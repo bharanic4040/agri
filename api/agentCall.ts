@@ -284,12 +284,12 @@ DO UPDATE SET response = EXCLUDED.response, expires_at = EXCLUDED.expires_at;
 `;
     } else {
       await sql`
-INSERT INTO pests_cache(crop_type, crop_sub_type, growthStage,
+INSERT INTO pests_cache(crop_type, crop_sub_type, growth_stage,
 weather, response, expires_at)
 VALUES( ${params.cropType}, ${params.cropSubType},${params.growthStage},
  ${params.weather}, ${llmResponse},
  NOW() + INTERVAL '180 days')
-ON CONFLICT(crop_type, crop_sub_type, growthStage, weather)
+ON CONFLICT(crop_type, crop_sub_type, growth_stage, weather)
 DO UPDATE SET response = EXCLUDED.response, expires_at = EXCLUDED.expires_at;`;
     }
 
