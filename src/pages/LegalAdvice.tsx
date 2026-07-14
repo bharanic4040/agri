@@ -41,11 +41,12 @@ export default function CropType() {
             return;
         }
         try {
-            setIsLoading(true);
+           
             setLawOutput(null);
             if (userQuery.trim() === "" || userQuery.trim().length >= 150) {
                 return;
             }
+             setIsLoading(true);
             const data = await fetchLawDetails(userQuery.trim());
             if (!data) {
                 return;
@@ -88,9 +89,16 @@ export default function CropType() {
                         >
                             మాట్లాడండి 🎤
                         </button>
+                       
                     )
                 )}
-                <textarea
+                 <button
+  onClick={() => setUserQuery("")} style={{ marginLeft: "10px"}}
+  className="px-3 py-2 rounded-xl bg-gray-600 text-white font-semibold shadow hover:bg-gray-700 transition"
+>
+  🗑️  క్లియర్
+</button>
+                <textarea style={{ marginTop: "10px"}}
                     rows={3}
                     placeholder=""
                     value={userQuery}

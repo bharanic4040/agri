@@ -111,12 +111,14 @@ export default function CropType() {
             return;
         }
         try {
-            setIsFertilizerLoading(true);
+            
             setPaddyLLMOutput(null);
+            setIsFertilizerLoading(true);
             const data = await fetchCropFertilizerSchedule(cropType, cropSubType);
             if (!data) {
                 return;
             }
+        
             const paddyLLMOutput: Map<string, string[]> = parseLLMOutputAndFormat(data);
             setPaddyLLMOutput(paddyLLMOutput);
         } catch (err) {
