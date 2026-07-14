@@ -1,4 +1,4 @@
-import type { CropProps, FertilizerScheduleResponse, Loc, MangoDiagnosis, PaddyDiagnosis } from "../models/agri";
+import type { CropProps, FertilizerScheduleResponse, LegalAdviceResponse, Loc, MangoDiagnosis, PaddyDiagnosis } from "../models/agri";
 
 export function loadCropsAndReturnMap(cropTypesArray: CropProps[]): Map<string, CropProps> {
   const dictionaryMap = new Map<string, CropProps>();
@@ -160,4 +160,29 @@ export async function fetchPests(
   }
   return null;
 }
+
+
+export async function fetchLawDetails(userQuery: string):
+ Promise<LegalAdviceResponse | null> {
+
+  try {
+    const res = await fetch("/api/lawCall", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ userQuery }),
+    });
+
+    if (!res.ok) {
+      return null;
+    }
+    const data: LegalAdviceResponse =  await res.json();
+    return data;
+  } catch (err) {
+    console.error(err);
+  }
+  return null;
+}
+
 

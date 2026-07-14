@@ -85,3 +85,13 @@ export interface PaddyDiagnosis {
   weather_and_stage_specific_advice: string[];
 }
 /* ends */
+
+/** LAW Advice */
+export interface LegalAdviceResponse {
+  "సమస్య విశ్లేషణ": string;
+  "సంబంధిత చట్టాలు మరియు సెక్షన్లు": string[];
+  "శిక్షల వివరాలు": string[];
+  "ఉదాహరణలు": string[];
+  "తదుపరి చర్యలు": string[];
+  "legal_disclaimer": string;
+}

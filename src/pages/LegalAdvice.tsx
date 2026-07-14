@@ -1,0 +1,104 @@
+import { Link } from "react-router-dom";
+import type { LegalAdviceResponse } from "../models/agri";
+import { FaHome } from "react-icons/fa";
+import { useEffect, useState } from "react";
+import { fetchLawDetails } from "../utils/utils";
+
+
+export default function CropType() {
+
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [userQuery, setUserQuery] = useState<string | null>(null);
+    const [lawOutput, setLawOutput] = useState<LegalAdviceResponse | null>(null);
+
+    useEffect(() => {}, []);
+
+    const fetchLegalDetails = async () => {
+        if (isLoading) {
+            return;
+        }
+        try {
+            setIsLoading(true);
+            setLawOutput(null);
+            setUserQuery("నా సోదరి నా పత్రాలను ఫోర్జరీ చేసింది");
+            const data = await fetchLawDetails("నా సోదరి నా పత్రాలను ఫోర్జరీ చేసింది");
+            if (!data) {
+                return;
+            }
+            setLawOutput(data);
+        } catch (err) {
+            console.error(err);
+        }
+        setIsLoading(false);
+    };
+
+    return (
+        <div className="text-blue-700 min-h-screen flex flex-col p-8">
+
+            <div className="w-full py-4 mb-6 bg-gradient-to-r from-blue-700 to-indigo-800 rounded-lg shadow-lg text-center">
+                <h4 className=" text-3xl md:text-4xl font-extrabold text-white tracking-wide">
+                   న్యాయ సలహా
+                </h4>
+            </div>
+            <div className="flex items-center gap-4">
+                <Link to="/">
+                    <FaHome size={45} />
+                </Link>
+            </div>
+
+            <div style={{ marginTop: "10px" }}>
+                <button onClick={fetchLegalDetails}
+                    className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg shadow">
+                    న్యాయ సలహా - నొక్కండి
+                </button>
+                {isLoading && (
+                    <div className="flex justify-center items-center py-4">
+                        <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-blue-600"></div>
+                    </div>
+                )}
+            </div>
+
+
+            {lawOutput &&
+                <div className="text-blue-700 bg-white rounded-lg shadow-md p-5 max-w-lg mx-auto"
+                    style={{ marginTop: "10px" }}>
+                        <div className="text-red-700 font-semibold">మీ సమస్య</div> 
+                     <div>{userQuery}</div>    <hr />
+                      <div className="text-red-700 font-semibold">సమస్య విశ్లేషణ</div> 
+                    <div>{lawOutput["సమస్య విశ్లేషణ"]}</div>
+                    <hr />
+                     {lawOutput["సంబంధిత చట్టాలు మరియు సెక్షన్లు"].length >= 1 &&
+                     <div className="text-red-700 font-semibold">శసంబంధిత చట్టాలు మరియు సెక్షన్లు</div>}
+                    {lawOutput["సంబంధిత చట్టాలు మరియు సెక్షన్లు"].map((item) => (
+                        <div key={item}>{item}</div>
+                    ))}
+                    <hr />
+                     {lawOutput["శిక్షల వివరాలు"].length >= 1 &&
+                     <div className="text-red-700 font-semibold">శిక్షల వివరాలు</div>}
+                    {lawOutput["శిక్షల వివరాలు"].map((item) => (
+                        <div key={item}>{item}</div>
+                    ))}
+                    <hr />
+                    {lawOutput["ఉదాహరణలు"].length >= 1 &&
+                     <div className="text-red-700 font-semibold">ఉదాహరణలు</div>}
+                    {lawOutput["ఉదాహరణలు"].map((item) => (
+                        <div key={item}>{item}</div>
+                    ))}
+                    <hr />
+                     {lawOutput["తదుపరి చర్యలు"].length >= 1 &&
+                     <div className="text-red-700 font-semibold">తదుపరి చర్యలు</div>}
+                    {lawOutput["తదుపరి చర్యలు"].map((item) => (
+                        <div key={item}>{item}</div>
+                    ))}
+                    <hr />
+                    <div>ఈ సమాచారం కేవలం అవగాహన కోసం మాత్రమే. ఇది వృత్తిపరమైన న్యాయ సలహాకు ప్రత్యామ్నాయం కాదు. మీ కేసు యొక్క ప్రత్యేక పరిస్థితులను బట్టి న్యాయ సలహా మారుతుంది, కాబట్టి దయచేసి ఒక అర్హత కలిగిన న్యాయవాదిని సంప్రదించండి.</div>
+
+
+                </div>
+            }
+
+
+        </div>
+
+    );
+}
