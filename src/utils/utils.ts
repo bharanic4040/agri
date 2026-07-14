@@ -30,21 +30,6 @@ export function parseLLMOutputAndFormat(paddyOutput: FertilizerScheduleResponse)
   return cropMap;
 }
 
-  /*
-  paddyOutput.schedule?.forEach((schedule, _) => {
-    if (!schedule.timeline || !schedule.fertilizers || schedule.fertilizers?.length === 0) {
-      return;
-    }
-    let fertArray: string[] = [];
-    schedule.fertilizers?.forEach((fertilizer, _) => {
-      const fertItem = fertilizer.name + " - " + fertilizer.quantity_kg_per_acre + " KG."
-      fertArray.push(fertItem);
-    });
-    cropMap.set(schedule.phase + "|" +schedule.timeline, fertArray);
-  });*/
-
- 
-
 /*
 ===================
 You can make the forecast more useful by requesting additional fields such as:
@@ -58,13 +43,6 @@ soil_moisture_0_to_1cm – surface soil moisture
 et0_fao_evapotranspiration – estimated water loss from soil and plants
 */
 
-/**
-0 mm - No rain
-0.1 mm - Almost dry
-1.8 mm - Light rain
-10 mm - Moderate rain
-50+ mm - Heavy rain
- */
 export function getRainDescription(rainfallMM: number | undefined): string {
   if (rainfallMM === undefined) {
     return "";
@@ -84,7 +62,9 @@ export function getRainDescription(rainfallMM: number | undefined): string {
   }
 }
 
-const OPEN_METEO_BASE_URL = "https://api.open-meteo.com/v1/forecast?daily=temperature_2m_max,precipitation_sum&timezone=auto&";
+//weather report API 
+const OPEN_METEO_BASE_URL = 
+"https://api.open-meteo.com/v1/forecast?daily=temperature_2m_max,precipitation_sum&timezone=auto&";
 
 export async function fetchWeatherData(latitude?: string, longitude?: string) {
   try {
@@ -112,7 +92,6 @@ export function getLocation(): Promise<Loc> {
       reject(new Error("Geolocation not supported"));
       return;
     }
-
     navigator.geolocation.getCurrentPosition(
       (position) => {
         resolve({
@@ -161,15 +140,13 @@ export async function fetchCropFertilizerSchedule(
 
 export async function fetchPests(
   cropType: string, cropSubType: string, queryType: string,
-   weather: string, growthStage: string 
-): Promise<MangoDiagnosis | PaddyDiagnosis | null> {
+   weather: string, growthStage: string ): 
+   Promise<MangoDiagnosis | PaddyDiagnosis | null> {
 
   try {
     const res = await fetch("/api/agentCall", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json", },
       body: JSON.stringify({ cropType, cropSubType, queryType, weather, growthStage }),
     });
 
