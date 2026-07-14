@@ -134,25 +134,25 @@ export default function CropType() {
                     <div className="text-red-700 font-semibold">సమస్య విశ్లేషణ</div>
                     <div>{lawOutput["సమస్య విశ్లేషణ"]}</div>
                     <hr />
-                    {lawOutput["సంబంధిత చట్టాలు మరియు సెక్షన్లు"].length >= 1 &&
+                    {lawOutput["సంబంధిత చట్టాలు మరియు సెక్షన్లు"] &&
                         <div className="text-red-700 font-semibold">సంబంధిత చట్టాలు మరియు సెక్షన్లు</div>}
                     {lawOutput["సంబంధిత చట్టాలు మరియు సెక్షన్లు"].map((item) => (
                         <div key={item}>{item}</div>
                     ))}
                     <hr />
-                    {lawOutput["శిక్షల వివరాలు"].length >= 1 &&
+                    {lawOutput["శిక్షల వివరాలు"] &&
                         <div className="text-red-700 font-semibold">శిక్షల వివరాలు</div>}
                     {lawOutput["శిక్షల వివరాలు"].map((item) => (
                         <div key={item}>{item}</div>
                     ))}
                     <hr />
-                    {lawOutput["ఉదాహరణలు"].length >= 1 &&
+                    {lawOutput["ఉదాహరణలు"] &&
                         <div className="text-red-700 font-semibold">ఉదాహరణలు</div>}
                     {lawOutput["ఉదాహరణలు"].map((item) => (
                         <div key={item}>{item}</div>
                     ))}
                     <hr />
-                    {lawOutput["తదుపరి చర్యలు"].length >= 1 &&
+                    {lawOutput["తదుపరి చర్యలు"] &&
                         <div className="text-red-700 font-semibold">తదుపరి చర్యలు</div>}
                     {lawOutput["తదుపరి చర్యలు"].map((item) => (
                         <div key={item}>{item}</div>
