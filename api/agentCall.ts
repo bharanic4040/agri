@@ -278,7 +278,7 @@ async function updateInDB(params: CropParams, llmResponse: any) {
       await sql`
 INSERT INTO fertilizer_cache(crop_type, crop_sub_type, response, expires_at)
 VALUES( ${params.cropType}, ${params.cropSubType}, ${llmResponse},
- NOW() + INTERVAL '60 days')
+ NOW() + INTERVAL '180 days')
 ON CONFLICT(crop_type, crop_sub_type)
 DO UPDATE SET response = EXCLUDED.response, expires_at = EXCLUDED.expires_at;
 `;
@@ -288,7 +288,7 @@ INSERT INTO pests_cache(crop_type, crop_sub_type, growthStage,
 weather, response, expires_at)
 VALUES( ${params.cropType}, ${params.cropSubType},${params.growthStage},
  ${params.weather}, ${llmResponse},
- NOW() + INTERVAL '60 days')
+ NOW() + INTERVAL '180 days')
 ON CONFLICT(crop_type, crop_sub_type, growthStage, weather)
 DO UPDATE SET response = EXCLUDED.response, expires_at = EXCLUDED.expires_at;`;
     }
