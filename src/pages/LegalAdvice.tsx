@@ -1,17 +1,40 @@
 import { Link } from "react-router-dom";
 import type { LegalAdviceResponse } from "../models/agri";
 import { FaHome } from "react-icons/fa";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { fetchLawDetails } from "../utils/utils";
-
+import SpeechRecognition, { useSpeechRecognition, } from "react-speech-recognition";
 
 export default function CropType() {
+
+    const {
+        transcript,
+        listening,
+        resetTranscript,
+        browserSupportsSpeechRecognition,
+    } = useSpeechRecognition();
+
+    const language = "te-IN";
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [userQuery, setUserQuery] = useState<string>("");
     const [lawOutput, setLawOutput] = useState<LegalAdviceResponse | null>(null);
 
-    useEffect(() => {}, []);
+    const resetListening = () => {
+      
+        if (listening) {
+            if (transcript) {
+                setUserQuery(transcript);
+            }
+            SpeechRecognition.stopListening();
+        } else {
+            resetTranscript();
+            SpeechRecognition.startListening({
+                continuous: true,
+                language: language,
+            });
+        }
+    };
 
     const fetchLegalDetails = async () => {
         if (isLoading) {
@@ -20,7 +43,7 @@ export default function CropType() {
         try {
             setIsLoading(true);
             setLawOutput(null);
-            if (userQuery.trim() === "" || userQuery.trim().length >= 100) {
+            if (userQuery.trim() === "" || userQuery.trim().length >= 150) {
                 return;
             }
             const data = await fetchLawDetails(userQuery.trim());
@@ -39,7 +62,7 @@ export default function CropType() {
 
             <div className="w-full py-4 mb-6 bg-gradient-to-r from-blue-700 to-indigo-800 rounded-lg shadow-lg text-center">
                 <h4 className=" text-3xl md:text-4xl font-extrabold text-white tracking-wide">
-                   న్యాయ సలహా
+                    న్యాయ సలహా
                 </h4>
             </div>
             <div className="flex items-center gap-4">
@@ -47,14 +70,32 @@ export default function CropType() {
                     <FaHome size={45} />
                 </Link>
             </div>
-              <div className="text-red-700 font-semibold">మీ సమస్యను వివరించండి</div> 
+            <div className="text-red-700 font-semibold">మీ సమస్యను వివరించండి</div>
             <div style={{ marginTop: "10px" }}>
+
+                {browserSupportsSpeechRecognition && (
+                    listening ? (
+                        <button
+                            onClick={resetListening}
+                            className="px-2 py-2 rounded-xl bg-red-600 text-white font-bold shadow-lg hover:bg-red-700"
+                        >
+                            ఆపండి 🎤
+                        </button>
+                    ) : (
+                        <button
+                            onClick={resetListening}
+                            className="px-2 py-2 rounded-xl bg-green-600 text-white font-bold shadow-lg hover:bg-green-700"
+                        >
+                            మాట్లాడండి 🎤
+                        </button>
+                    )
+                )}
                 <textarea
-  rows={3}
-  placeholder=""
-  value={userQuery}
- onChange={(e) => setUserQuery(e.target.value)}
-  className="
+                    rows={3}
+                    placeholder=""
+                    value={userQuery}
+                    onChange={(e) => setUserQuery(e.target.value)}
+                    className="
     w-full
     rounded-xl
     border border-gray-300
@@ -71,7 +112,7 @@ export default function CropType() {
     focus:ring-red-200
     focus:outline-none
   "
-/>
+                />
             </div>
 
             <div style={{ marginTop: "10px" }}>
@@ -90,35 +131,35 @@ export default function CropType() {
             {lawOutput &&
                 <div className="text-blue-700 bg-white rounded-lg shadow-md p-5 max-w-lg mx-auto"
                     style={{ marginTop: "10px" }}>
-                      <div className="text-red-700 font-semibold">సమస్య విశ్లేషణ</div> 
+                    <div className="text-red-700 font-semibold">సమస్య విశ్లేషణ</div>
                     <div>{lawOutput["సమస్య విశ్లేషణ"]}</div>
                     <hr />
-                     {lawOutput["సంబంధిత చట్టాలు మరియు సెక్షన్లు"].length >= 1 &&
-                     <div className="text-red-700 font-semibold">సంబంధిత చట్టాలు మరియు సెక్షన్లు</div>}
+                    {lawOutput["సంబంధిత చట్టాలు మరియు సెక్షన్లు"].length >= 1 &&
+                        <div className="text-red-700 font-semibold">సంబంధిత చట్టాలు మరియు సెక్షన్లు</div>}
                     {lawOutput["సంబంధిత చట్టాలు మరియు సెక్షన్లు"].map((item) => (
                         <div key={item}>{item}</div>
                     ))}
                     <hr />
-                     {lawOutput["శిక్షల వివరాలు"].length >= 1 &&
-                     <div className="text-red-700 font-semibold">శిక్షల వివరాలు</div>}
+                    {lawOutput["శిక్షల వివరాలు"].length >= 1 &&
+                        <div className="text-red-700 font-semibold">శిక్షల వివరాలు</div>}
                     {lawOutput["శిక్షల వివరాలు"].map((item) => (
                         <div key={item}>{item}</div>
                     ))}
                     <hr />
                     {lawOutput["ఉదాహరణలు"].length >= 1 &&
-                     <div className="text-red-700 font-semibold">ఉదాహరణలు</div>}
+                        <div className="text-red-700 font-semibold">ఉదాహరణలు</div>}
                     {lawOutput["ఉదాహరణలు"].map((item) => (
                         <div key={item}>{item}</div>
                     ))}
                     <hr />
-                     {lawOutput["తదుపరి చర్యలు"].length >= 1 &&
-                     <div className="text-red-700 font-semibold">తదుపరి చర్యలు</div>}
+                    {lawOutput["తదుపరి చర్యలు"].length >= 1 &&
+                        <div className="text-red-700 font-semibold">తదుపరి చర్యలు</div>}
                     {lawOutput["తదుపరి చర్యలు"].map((item) => (
                         <div key={item}>{item}</div>
                     ))}
                     <hr />
-                    
-                      <div className="text-red-700 font-semibold">ముఖ్య గమనిక</div> 
+
+                    <div className="text-red-700 font-semibold">ముఖ్య గమనిక</div>
                     <div>ఈ సమాచారం కేవలం అవగాహన కోసం మాత్రమే. ఇది వృత్తిపరమైన న్యాయ సలహాకు ప్రత్యామ్నాయం కాదు. మీ కేసు యొక్క ప్రత్యేక పరిస్థితులను బట్టి న్యాయ సలహా మారుతుంది, కాబట్టి దయచేసి ఒక అర్హత కలిగిన న్యాయవాదిని సంప్రదించండి.</div>
 
 
