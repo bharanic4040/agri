@@ -49,6 +49,7 @@ export default function CropType() {
              setIsLoading(true);
             const data = await fetchLawDetails(userQuery.trim());
             if (!data) {
+                setIsLoading(false);
                 return;
             }
             setLawOutput(data);

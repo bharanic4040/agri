@@ -97,6 +97,7 @@ export default function CropType() {
             const data: MangoDiagnosis | PaddyDiagnosis | null
                 = await fetchPests(cropType, cropSubType, "pests", weather, growthStage);
             if (!data) {
+                setIsPestsLoading(false);
                 return;
             }
             setPestsLLMOutput(data);
@@ -116,6 +117,7 @@ export default function CropType() {
             setIsFertilizerLoading(true);
             const data = await fetchCropFertilizerSchedule(cropType, cropSubType);
             if (!data) {
+                setIsFertilizerLoading(false);
                 return;
             }
         
